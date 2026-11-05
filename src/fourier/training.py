@@ -150,8 +150,10 @@ def run(cfg):
             "interval": "epoch"}})
     root = Path(__file__).resolve().parents[2]
     run_dir = root / "artifacts" / "training" / cfg.output_model_name
+    checkpoint_dir = root / cfg.checkpoint_dir / cfg.output_model_name
     resume_from = cfg.get("resume_from")
     run_dir.mkdir(parents=True, exist_ok=bool(resume_from))
+    checkpoint_dir.mkdir(parents=True, exist_ok=bool(resume_from))
     OmegaConf.save(cfg, run_dir / "config.yaml")
     record = {
         "train_dataset": str(name), "validation_dataset": cfg.validation_dataset,
@@ -161,6 +163,7 @@ def run(cfg):
         "batch_size": loader_cfg["batch_size"], "planned_epochs": cfg.trainer.max_epochs,
         "train_batches_per_epoch": n_batches, "planned_max_steps": cfg.trainer.get("max_steps", -1), "pid": os.getpid(),
         "torch": torch.__version__, "status": "running",
+        "checkpoint_dir": str(checkpoint_dir),
     }
     (run_dir / "run.json").write_text(json.dumps(record, indent=2))
 
@@ -187,8 +190,8 @@ def run(cfg):
         **OmegaConf.to_container(cfg.trainer, resolve=True),
         default_root_dir=str(run_dir),
         logger=CSVLogger(str(run_dir), name="metrics"),
-        callbacks=[SaveCkptCallback(cfg.output_model_name, cfg.model), Metrics(),
-                   ModelCheckpoint(dirpath=str(run_dir / "resume"),
+        callbacks=[SaveCkptCallback(str(checkpoint_dir), cfg.model), Metrics(),
+                   ModelCheckpoint(dirpath=str(checkpoint_dir / "resume"),
                                    filename="step-{step:09d}",
                                    every_n_train_steps=cfg.checkpoint_every_steps,
                                    save_top_k=1, save_last=True)],
@@ -203,7 +206,7 @@ def run(cfg):
     # A max_steps stop inside an epoch does not trigger Lightning epoch-end validation.
     if cfg.trainer.get("max_steps", -1) > 0 and trainer.global_step % n_batches:
         trainer.validate(module, dataloaders=val, verbose=True)
-    save_pretrained(model, cfg.output_model_name, cfg.model, filename="weights.pt")
+    save_pretrained(model, str(checkpoint_dir), cfg.model, filename="weights.pt")
     record.update(status="completed", epochs=trainer.current_epoch,
                   global_step=trainer.global_step, completed_full_epochs=trainer.global_step // len(train),
                   fractional_epochs=trainer.global_step / len(train), elapsed_seconds=time.time()-start)
@@ -213,63 +216,9 @@ def run(cfg):
     print(json.dumps(record, indent=2), flush=True)
 
 
-
-def prepare_eval_data(source, target, episodes=10):
-    """Adapt official HDF5 validation data to stock SWM evaluation; no source edits."""
-    from pathlib import Path
-    import json
-    import h5py
-    import numpy as np
-    from torchvision.transforms import v2
-    source, target = Path(source), Path(target)
-    if source.resolve() == target.resolve():
-        raise ValueError("Evaluation output must differ from the source dataset")
-    target.parent.mkdir(parents=True, exist_ok=True)
-    temporary=target.with_suffix(".preparing.h5")
-    torch.set_num_threads(4)
-    with h5py.File(source,"r") as src,h5py.File(temporary,"w") as dst:
-        lengths=src["ep_len"][:episodes]
-        n=int(lengths.sum())
-        for key in src:
-            item=src[key]
-            if not isinstance(item,h5py.Dataset) or key=="pixels": continue
-            count=len(lengths) if key in ("ep_len","ep_offset") else n
-            layout=h5py.VirtualLayout(shape=(count,*item.shape[1:]),dtype=item.dtype)
-            layout[:]=h5py.VirtualSource(str(source),"/"+key,shape=item.shape)[:count]
-            dst.create_virtual_dataset(key,layout)
-        output=dst.create_dataset("pixels",shape=(n,224,224,3),dtype="u1",
-                                  chunks=(1,224,224,3),compression="lzf")
-        resize=v2.Resize((224,224),antialias=True)
-        for start in range(0,n,128):
-            pixels=torch.from_numpy(src["pixels"][start:min(start+128,n)]).permute(0,3,1,2)
-            output[start:start+128]=resize(pixels).permute(0,2,3,1).numpy()
-        dst.create_dataset("episode_idx",data=np.repeat(np.arange(len(lengths)),lengths))
-        dst.create_dataset("step_idx",data=np.concatenate([np.arange(n) for n in lengths]))
-        qpos=src["qpos"][:n]
-        dst.create_dataset("privileged_block_0_pos",data=qpos[:,-7:-4])
-        dst.create_dataset("privileged_block_0_quat",data=qpos[:,-4:])
-        dst.attrs["source"]=str(source)
-        dst.attrs["description"]="Official validation subset; SWM 224x224 eval view; numeric VDS"
-    temporary.replace(target)
-    record={"source":str(source),"evaluation_file":str(target),"official_validation_episode_indices":list(range(len(lengths))),
-            "rows":n,"pixels":"uint8 bilinear antialiased resize 64->224; other source columns use VDS",
-            "cube_pose":"qpos[-7:-4], qpos[-4:]","original_source_modified":False}
-    target.with_suffix(".json").write_text(json.dumps(record,indent=2))
-    print(json.dumps(record),flush=True)
-    
 if __name__ == "__main__":
-    import sys
     from pathlib import Path
-    if len(sys.argv) > 1 and sys.argv[1] == "--prepare-eval-data":
-        import argparse
-        parser = argparse.ArgumentParser(description="Prepare SWM OGCube evaluation view")
-        parser.add_argument("--source", required=True)
-        parser.add_argument("--target", required=True)
-        parser.add_argument("--episodes", type=int, default=10)
-        args = parser.parse_args(sys.argv[2:])
-        prepare_eval_data(args.source, args.target, args.episodes)
-    else:
-        import hydra
-        hydra.main(version_base=None,
-                   config_path=str(Path(__file__).resolve().parents[2] / "configs"),
-                   config_name="training")(run)()
+    import hydra
+    hydra.main(version_base=None,
+               config_path=str(Path(__file__).resolve().parents[2] / "configs" / "train"),
+               config_name="training")(run)()

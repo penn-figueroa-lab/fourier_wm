@@ -10,10 +10,8 @@ Run commands from the project root:
 
 ```text
 configs/
-├── train/fourier.yaml  # Fourier model; inherits SWM LeWM defaults and Cube data
-├── plan/sqp.yaml       # our solver parameters
-├── training.yaml       # compatibility symlink to train/fourier.yaml
-└── planning.yaml       # historical play-data final-evaluation protocol
+├── train/training.yaml  # Fourier model; inherits SWM LeWM defaults and Cube data
+└── plan/sqp.yaml        # our solver parameters
 ```
 
 Cube task/data YAMLs are loaded directly from SWM; there are no local copies of
@@ -56,7 +54,7 @@ does not establish the exact data snapshot used for a published table.
 ## Train
 
 ```bash
-.venv/bin/python -m fourier.training --config-name train/fourier \
+.venv/bin/python -m fourier.training --config-name training \
   output_model_name=fourier_cube_expert
 ```
 
@@ -67,7 +65,7 @@ mapping with FourierWorldModel/FourierDynamics. Primitive action width is inferr
 from the dataset. Normalized raw actions pass through an Identity action encoder;
 visual projector/prediction projection also remain Identity.
 
-The existing training code and losses are unchanged: encode four sampled
+The supplied dynamics and loss computations are unchanged: encode four sampled
 observations, apply five primitive transitions between adjacent observations,
 and supervise the three endpoints. SIGReg and endpoint loss jointly update the
 encoder and dynamics. Two loader workers and single-device training are retained.
@@ -77,15 +75,18 @@ batch. This is not an exact architectural/validation reproduction of LeWM.
 For a small training/validation check, use a distinct output name:
 
 ```bash
-.venv/bin/python -m fourier.training --config-name train/fourier \
+.venv/bin/python -m fourier.training --config-name training \
   output_model_name=fourier_cube_expert_smoke \
   trainer.max_steps=200 trainer.limit_val_batches=32
 ```
 
-Logs, resolved configuration, run metadata, and Lightning resume state are stored
-under `artifacts/training/<run>/`. SWM inference checkpoints are saved under
-`$STABLEWM_HOME/checkpoints/<run>/`. Resume with the same run/configuration and
-`resume_from=<last.ckpt>`; use a new output name for a fresh run.
+Logs, resolved configuration and run metadata are stored under `artifacts/training/<run>/`.
+All model checkpoints are stored under the Git-ignored `checkpoint/<run>/`:
+`weights_epoch_N.pt`, `weights.pt` and `config.json` for inference;
+`resume/last.ckpt` for full Lightning optimizer/scheduler/loop state.
+The `checkpoint_dir: checkpoint` setting is relative to the project root.
+Resume with the same run/configuration and `resume_from=<last.ckpt>`;
+use a new output name and `resume_from=null` for a fresh run.
 
 ## Plan
 
@@ -95,7 +96,7 @@ Use SWM's original Cube task configuration and replace its solver group:
 .venv/bin/python stable-worldmodel/scripts/plan/eval_wm.py \
   --config-dir configs --config-name cube \
   '~solver' '+plan@solver=sqp' \
-  policy=fourier_cube_expert/weights.pt \
+  policy="${PWD}/checkpoint/fourier_cube_expert/weights.pt" \
   +plan_config.history_len=1 +plan_config.warm_start=true
 ```
 
@@ -109,6 +110,12 @@ reported separately.
 
 For a two-case pipeline check, add `eval.num_eval=2` and use the smoke checkpoint.
 This verifies execution, not learned performance.
+
+The requested final comparison uses evaluation seeds 0, 1 and 2, with 50 cases
+per seed (150 total), keeping the same trained checkpoint and planning protocol.
+These are evaluation sampling seeds, not three independently trained models.
+For metrics-only checks, call the same SWM interfaces with `World.evaluate(video=None)`;
+no additional reports or video files are needed.
 
 ## Modules and validation
 
@@ -138,8 +145,8 @@ Its checkpoint, complete configuration, metrics, and 50-case videos remain in
 their original run directories. The final seed42 SQP result was 24/50 (48%):
 20/20 initially within 4cm and 4/30 initially outside. Those cases came from the
 first ten play validation trajectories and are not comparable to expert-data
-evaluation. The legacy `configs/planning.yaml` remains for that historical
-protocol; it is not the entry point for new expert-data evaluations.
+evaluation. Its resolved historical configuration remains with the old run
+artifacts; new evaluations load SWM's original Cube configuration directly.
 
 The two temporary configuration migration archives were deleted after the old
 training and final evaluation were verified. No training logs, checkpoints,

@@ -122,12 +122,22 @@ def test_solver_protocol_and_coordinate_conversion():
 
 def test_config_targets():
     from hydra import initialize_config_dir,compose
-    with initialize_config_dir(config_dir=str(ROOT/"configs"),version_base=None):
+    with initialize_config_dir(config_dir=str(ROOT/"configs/train"),version_base=None):
         cfg=compose(config_name="training")
         assert cfg.model._target_=="fourier.world_model.FourierWorldModel"
         assert cfg.model.predictor._target_=="fourier.predictor.FourierDynamics"
         assert "action_encoder" not in cfg.model
         assert "action" in cfg.data.dataset.keys_to_load
-        planning=compose(config_name="planning")
+        assert cfg.data.dataset.name=="ogbench/cube_single_expert.h5"
+    # Use the same upstream Cube task and local solver groups as the real CLI.
+    with initialize_config_dir(
+            config_dir=str(ROOT/"stable-worldmodel/scripts/plan/config"),
+            version_base=None):
+        planning=compose(config_name="cube",overrides=[
+            f"hydra.searchpath=[file://{ROOT/'configs'}]",
+            "~solver","+plan@solver=sqp",
+            "+plan_config.history_len=1","+plan_config.warm_start=true"])
         assert planning.solver._target_=="fourier.sqp.SWMSQPSolver"
+        assert "num_samples" not in planning.solver
+        assert planning.eval.dataset_name=="ogbench/cube_single_expert.h5"
         assert planning.plan_config.horizon*planning.plan_config.action_block==25

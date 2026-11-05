@@ -13,6 +13,7 @@ hydra:
   - file://./stable-worldmodel
 resume_from: null
 checkpoint_every_steps: 1000
+checkpoint_dir: checkpoint
 validation_dataset: null
 fourier:
   model:
