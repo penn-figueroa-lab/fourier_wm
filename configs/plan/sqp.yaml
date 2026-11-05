@@ -1,0 +1,9 @@
+_target_: fourier.sqp.SWMSQPSolver
+iterations: 10
+smoothness: 0.1
+magnitude: 0.0
+damping: 0.01
+bound: 3.0
+max_step: 1.0
+device: cuda
+stats_dataset: ${eval.dataset_name}
