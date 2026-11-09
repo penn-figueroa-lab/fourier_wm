@@ -3,6 +3,15 @@ defaults:
   - solver: cem
   - objective: goal_mse
   - _self_
+  - override hydra/job_logging: disabled
+  - override hydra/hydra_logging: disabled
+
+hydra:
+  run:
+    dir: .
+  output_subdir: null
+  job:
+    chdir: false
 
 world:
   env_name: swm/OGBCube-v0
@@ -59,4 +68,6 @@ eval:
           value: goal_privileged_block_0_quat
 
 output:
+  save_results: false
+  save_video: false
   filename: ogb_cube_results.txt

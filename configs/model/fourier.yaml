@@ -1,0 +1,32 @@
+# Task-independent LeWM model with Fourier dynamics and identity prediction output.
+_target_: stable_worldmodel.wm.lewm.LeWM
+encoder:
+  _target_: stable_pretraining.backbone.utils.vit_hf
+  size: ${encoder_scale}
+  patch_size: ${patch_size}
+  image_size: ${img_size}
+  pretrained: false
+  use_mask_token: false
+predictor:
+  _target_: fourier.world_model.FourierPredictor
+  num_frames: ${wm.history_size}
+  input_dim: ${embed_dim}
+  action_dim: ${model.action_encoder.input_dim}
+  action_block: ${data.dataset.frameskip}
+  num_frequencies: 768
+  frequency_scales: [0.25, 0.5, 1.0, 2.0]
+  init_scale: 0.001
+  learnable_frequencies: true
+action_encoder:
+  _target_: torch.nn.Identity
+  input_dim: ???
+projector:
+  _target_: stable_worldmodel.wm.lewm.module.MLP
+  input_dim: ${embed_dim}
+  output_dim: ${embed_dim}
+  hidden_dim: 2048
+  norm_fn:
+    _target_: torch.nn.BatchNorm1d
+    _partial_: true
+pred_proj:
+  _target_: torch.nn.Identity

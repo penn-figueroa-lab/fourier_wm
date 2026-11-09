@@ -29,3 +29,32 @@ class FourierWorldModel(LeWM):
             raise ValueError(f"Expected action block width {expected}")
         controls = act_emb.unflatten(-1, (self.action_block, self.predictor.action_dim))
         return self.predictor.rollout(emb, controls)[..., -1, :]
+
+
+from .predictor import FourierDynamics
+
+
+class FourierPredictor(nn.Module):
+    """Predict each context frame's successor from its raw action block."""
+
+    def __init__(self, input_dim=192, action_dim=25, action_block=5,
+                 num_frames=3, num_frequencies=768,
+                 frequency_scales=(.25, .5, 1., 2.), init_scale=1e-3,
+                 learnable_frequencies=True):
+        super().__init__()
+        if action_block < 1 or action_dim < 1 or action_dim % action_block:
+            raise ValueError("Action-block width must be a multiple of action_block")
+        self.num_frames = int(num_frames)
+        self.action_block = int(action_block)
+        self.macro_action_dim = int(action_dim)
+        self.dynamics = FourierDynamics(
+            latent_dim=input_dim, action_dim=action_dim // action_block,
+            num_frequencies=num_frequencies, frequency_scales=frequency_scales,
+            init_scale=init_scale, learnable_frequencies=learnable_frequencies)
+
+    def forward(self, emb, act_emb):
+        if act_emb.shape[-1] != self.macro_action_dim:
+            raise ValueError("Expected flattened raw action blocks")
+        controls = act_emb.unflatten(
+            -1, (self.action_block, self.dynamics.action_dim))
+        return self.dynamics.rollout(emb, controls)[..., -1, :]
