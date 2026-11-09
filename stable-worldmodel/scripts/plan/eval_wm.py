@@ -182,11 +182,11 @@ def run(cfg: DictConfig):
 
     world.set_policy(policy)
 
-    results_path.mkdir(parents=True, exist_ok=True)
-    print(
-        f'[eval] saving videos to {results_path.resolve()} '
-        '(one env_{i}.mp4 per env)'
-    )
+    save_results = bool(cfg.output.get("save_results", False))
+    save_video = bool(cfg.output.get("save_video", False))
+    if save_results or save_video:
+        results_path.mkdir(parents=True, exist_ok=True)
+    video_path = results_path if save_video else None
 
     autocast_ctx = torch.autocast(
         device_type='cuda',
@@ -212,7 +212,7 @@ def run(cfg: DictConfig):
                 callables=OmegaConf.to_container(
                     cfg.eval.get('callables'), resolve=True
                 ),
-                video=results_path,
+                video=None,
             )
         print('Warmup done.')
 
@@ -227,26 +227,24 @@ def run(cfg: DictConfig):
             callables=OmegaConf.to_container(
                 cfg.eval.get('callables'), resolve=True
             ),
-            video=results_path,
+            video=video_path,
         )
     end_time = time.time()
 
     print(metrics)
-    print(f'[eval] videos saved to {results_path.resolve()}')
-
-    results_path = results_path / cfg.output.filename
-    results_path.parent.mkdir(parents=True, exist_ok=True)
-
-    with results_path.open('a') as f:
-        f.write('\n')  # separate from previous runs
-
-        f.write('==== CONFIG ====\n')
-        f.write(OmegaConf.to_yaml(cfg))
-        f.write('\n')
-
-        f.write('==== RESULTS ====\n')
-        f.write(f'metrics: {metrics}\n')
-        f.write(f'evaluation_time: {end_time - start_time} seconds\n')
+    print(f'[eval] elapsed: {end_time - start_time:.3f}s')
+    if save_video:
+        print(f'[eval] videos saved to {results_path.resolve()}')
+    if save_results:
+        results_file = results_path / cfg.output.filename
+        with results_file.open('a') as f:
+            f.write('==== CONFIG ====\n')
+            f.write(OmegaConf.to_yaml(cfg))
+            f.write('\n==== RESULTS ====\n')
+            f.write(f'metrics: {metrics}\n')
+            f.write(f'evaluation_time: {end_time - start_time} seconds\n')
+    world.close()
+    return metrics
 
 
 if __name__ == '__main__':

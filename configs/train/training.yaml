@@ -1,59 +1,24 @@
 # @package _global_
-# SWM defaults and Cube data; only Fourier settings and API compatibility are local.
+# Preserve upstream LeWM training settings; select the task through data overrides.
 defaults:
 - /scripts/train/config/lewm@_global_
-- override /scripts/train/config/data@data: ogb
+- /model@fourier_model: fourier
 - _self_
+- override hydra/job_logging: disabled
+- override hydra/hydra_logging: disabled
 hydra:
+  output_subdir: null
   job:
     chdir: false
   run:
-    dir: artifacts/hydra/train/${now:%Y%m%d_%H%M%S}
+    dir: .
   searchpath:
+  - file://./configs
   - file://./stable-worldmodel
+model: ${fourier_model}
+# Checkpoint management is project-owned; model/data/loss settings stay upstream.
 resume_from: null
 checkpoint_every_steps: 1000
 checkpoint_dir: checkpoint
 validation_dataset: null
-fourier:
-  model:
-    _target_: fourier.world_model.FourierWorldModel
-    action_block: ${data.dataset.frameskip}
-    encoder:
-      _target_: stable_pretraining.backbone.utils.vit_hf
-      size: ${encoder_scale}
-      patch_size: ${patch_size}
-      image_size: ${img_size}
-      pretrained: false
-      use_mask_token: false
-    predictor:
-      _target_: fourier.predictor.FourierDynamics
-      latent_dim: ${embed_dim}
-      action_dim: ???
-      num_frequencies: 768
-      frequency_scales:
-      - 0.25
-      - 0.5
-      - 1
-      - 2
-      init_scale: 0.001
-      learnable_frequencies: true
-    action_mean: null
-    action_scale: null
-model: ${fourier.model}
-loss:
-  sigreg_weight: ${loss.sigreg.weight}
-  knots: ${loss.sigreg.kwargs.knots}
-  num_proj: ${loss.sigreg.kwargs.num_proj}
-num_workers: 2
-loader:
-  drop_last: false
-trainer:
-  max_steps: -1
-  gradient_clip_val: null
-  limit_train_batches: 1.0
-  limit_val_batches: 1.0
-  log_every_n_steps: 10
-  enable_progress_bar: false
-  devices: 1
 subdir: .

@@ -58,6 +58,10 @@ def world_model_loss(dynamics, embeddings, controls, regularizer, sigreg_weight=
 
 # Project-owned integration glue. The definitions above are the supplied code.
 def swm_forward(self, batch, stage, cfg):
+    if cfg.model._target_ == "stable_worldmodel.wm.lewm.LeWM":
+        from scripts.train.lewm import lejepa_forward
+        return lejepa_forward(self, batch, stage, cfg)
+
     emb = self.model.encode(batch)["emb"]
     m, k = self.model.predictor.action_dim, self.model.action_block
     controls = batch["action"][:, :-1].unflatten(-1, (k, m))
@@ -67,15 +71,13 @@ def swm_forward(self, batch, stage, cfg):
         self.model.predictor, emb, controls, self.sigreg, cfg.loss.sigreg_weight)
     self.log_dict({f"{stage}/loss": loss.detach(),
                    **{f"{stage}/{key}": value for key, value in parts.items()}},
-                  on_step=stage == "fit", on_epoch=True, batch_size=emb.shape[0])
+                  on_step=stage == "fit", on_epoch=True, batch_size=emb.shape[0], logger=False)
     return {"loss": loss}
 
 
 def run(cfg):
     import json
     import math
-    import os
-    import time
     from functools import partial
     from pathlib import Path
     import hydra
@@ -84,12 +86,13 @@ def run(cfg):
     import stable_worldmodel as swm
     import numpy as np
     from omegaconf import OmegaConf, open_dict
-    from lightning.pytorch.loggers import CSVLogger
     from lightning.pytorch.callbacks import ModelCheckpoint
     from stable_worldmodel.data import column_normalizer
     from stable_worldmodel.wm.utils import save_pretrained
     from scripts.train.lewm import get_img_preprocessor, SaveCkptCallback
 
+    lewm_mode = cfg.model._target_ == "stable_worldmodel.wm.lewm.LeWM"
+    clip_value = cfg.trainer.gradient_clip_val if lewm_mode else 1.0
     pl.seed_everything(cfg.seed, workers=True)
     torch.set_float32_matmul_precision("highest")
     dataset_args = OmegaConf.to_container(cfg.data.dataset, resolve=True)
@@ -116,9 +119,13 @@ def run(cfg):
             dataset, [cfg.train_split, 1-cfg.train_split],
             generator=torch.Generator().manual_seed(cfg.seed))
     with open_dict(cfg):
-        cfg.model.predictor.action_dim = m
-        cfg.model.action_mean = mean.tolist()
-        cfg.model.action_scale = scale.tolist()
+        if lewm_mode:
+            # Identity accepts this width; the Fourier adapter splits it into raw actions.
+            cfg.model.action_encoder.input_dim = cfg.data.dataset.frameskip * m
+        else:
+            cfg.model.predictor.action_dim = m
+            cfg.model.action_mean = mean.tolist()
+            cfg.model.action_scale = scale.tolist()
     loader_cfg = OmegaConf.to_container(cfg.loader, resolve=True)
     if loader_cfg["batch_size"] < 2:
         raise ValueError("SIGReg requires batch_size >= 2")
@@ -126,11 +133,11 @@ def run(cfg):
         loader_cfg["persistent_workers"] = False
     train = torch.utils.data.DataLoader(
         train_dataset, **loader_cfg, generator=torch.Generator().manual_seed(cfg.seed))
-    val_cfg = {**loader_cfg, "shuffle": False, "drop_last": True}
+    val_cfg = {**loader_cfg, "shuffle": False, "drop_last": not lewm_mode}
     val = torch.utils.data.DataLoader(val_dataset, **val_cfg)
     model = hydra.utils.instantiate(cfg.model)
     n_batches = len(train)
-    limit = cfg.trainer.limit_train_batches
+    limit = cfg.trainer.get("limit_train_batches", 1.0)
     if isinstance(limit, int):
         n_batches = min(n_batches, limit)
     elif limit < 1:
@@ -139,81 +146,72 @@ def run(cfg):
     if cfg.trainer.get("max_steps", -1) > 0:
         total_steps = min(total_steps, cfg.trainer.max_steps)
     module = spt.Module(
-        model=model, sigreg=SIGReg(cfg.loss.knots, cfg.loss.num_proj),
+        model=model, sigreg=(swm.wm.loss.SIGReg(**cfg.loss.sigreg.kwargs)
+                            if lewm_mode else SIGReg(cfg.loss.knots, cfg.loss.num_proj)),
         forward=partial(swm_forward, cfg=cfg),
         optim={"model_opt": {
             "modules": "model", "optimizer": dict(cfg.optimizer),
-            "gradient_clip_val": 1.0,
+            "gradient_clip_val": clip_value,
             "scheduler": {"type": "LinearWarmupCosineAnnealingLR",
                           "warmup_steps": max(1, int(.01 * total_steps)),
                           "max_steps": max(2, total_steps)},
             "interval": "epoch"}})
     root = Path(__file__).resolve().parents[2]
-    run_dir = root / "artifacts" / "training" / cfg.output_model_name
     checkpoint_dir = root / cfg.checkpoint_dir / cfg.output_model_name
     resume_from = cfg.get("resume_from")
-    run_dir.mkdir(parents=True, exist_ok=bool(resume_from))
     checkpoint_dir.mkdir(parents=True, exist_ok=bool(resume_from))
-    OmegaConf.save(cfg, run_dir / "config.yaml")
-    record = {
+    # These describe how to reload/resume the checkpoint; they are not logs.
+    OmegaConf.save(cfg, checkpoint_dir / "training_config.yaml")
+    metadata = {
         "train_dataset": str(name), "validation_dataset": cfg.validation_dataset,
         "train_clips": len(train_dataset), "validation_clips": len(val_dataset),
-        "primitive_action_dim": m, "action_block": model.action_block,
+        "primitive_action_dim": m, "action_block": cfg.data.dataset.frameskip,
         "action_mean": mean.tolist(), "action_scale": scale.tolist(),
         "batch_size": loader_cfg["batch_size"], "planned_epochs": cfg.trainer.max_epochs,
-        "train_batches_per_epoch": n_batches, "planned_max_steps": cfg.trainer.get("max_steps", -1), "pid": os.getpid(),
-        "torch": torch.__version__, "status": "running",
+        "train_batches_per_epoch": n_batches,
+        "planned_max_steps": cfg.trainer.get("max_steps", -1),
         "checkpoint_dir": str(checkpoint_dir),
     }
-    (run_dir / "run.json").write_text(json.dumps(record, indent=2))
+    (checkpoint_dir / "training_metadata.json").write_text(json.dumps(metadata, indent=2))
 
-    class Metrics(pl.Callback):
-        def on_train_batch_end(self, trainer, pl_module, outputs, batch, batch_idx):
-            if trainer.global_step % cfg.checkpoint_every_steps == 0:
-                record.update(global_step=trainer.global_step,
-                              completed_full_epochs=trainer.global_step // len(train),
-                              fractional_epochs=trainer.global_step / len(train),
-                              elapsed_seconds=time.time()-start)
-                (run_dir / "run.json").write_text(json.dumps(record, indent=2))
+    class CheckpointMetadata(pl.Callback):
+        def on_save_checkpoint(self, trainer, pl_module, checkpoint):
+            checkpoint["fourier_training"] = {
+                **metadata, "global_step": trainer.global_step,
+                "completed_full_epochs": trainer.global_step // len(train),
+                "config": OmegaConf.to_container(cfg, resolve=True),
+            }
 
         def on_validation_epoch_end(self, trainer, pl_module):
-            values = {k: float(v.detach().cpu()) for k,v in trainer.callback_metrics.items()
-                      if torch.is_tensor(v) and v.numel() == 1}
-            if not all(math.isfinite(v) for v in values.values()):
-                raise ValueError(f"Non-finite metrics: {values}")
-            if not trainer.sanity_checking:
-                with (run_dir / "epochs.jsonl").open("a") as f:
-                    f.write(json.dumps({"epoch": trainer.current_epoch + (0 if trainer.state.fn.value == "validate" else 1),
-                                        "step": trainer.global_step, **values}) + "\n")
+            values = [float(v.detach().cpu()) for v in trainer.callback_metrics.values()
+                      if torch.is_tensor(v) and v.numel() == 1]
+            if not all(math.isfinite(v) for v in values):
+                raise ValueError("Non-finite validation metrics")
 
+    trainer_args = OmegaConf.to_container(cfg.trainer, resolve=True)
+    # Installed stable-pretraining clips manual optimizers; Lightning requires None here.
+    trainer_args["gradient_clip_val"] = None
     trainer = pl.Trainer(
-        **OmegaConf.to_container(cfg.trainer, resolve=True),
-        default_root_dir=str(run_dir),
-        logger=CSVLogger(str(run_dir), name="metrics"),
-        callbacks=[SaveCkptCallback(str(checkpoint_dir), cfg.model), Metrics(),
+        **trainer_args,
+        default_root_dir=str(checkpoint_dir), logger=False,
+        callbacks=[SaveCkptCallback(str(checkpoint_dir), cfg.model), CheckpointMetadata(),
                    ModelCheckpoint(dirpath=str(checkpoint_dir / "resume"),
                                    filename="step-{step:09d}",
                                    every_n_train_steps=cfg.checkpoint_every_steps,
                                    save_top_k=1, save_last=True)],
         enable_checkpointing=True, num_sanity_val_steps=1)
-    # Installed stable_pretraining supports these manual-optimization aliases.
-    # Lightning rejects its native gradient_clip_val for manual optimization.
-    trainer.gradient_clip_val_ = 1.0
+    # stable-pretraining auto-registers an environment-report writer even with
+    # logger=False. Drop that file-writing callback before Trainer.fit setup.
+    trainer.callbacks = [callback for callback in trainer.callbacks
+                         if type(callback).__name__ != "EnvironmentDumpCallback"]
+    trainer.gradient_clip_val_ = clip_value
     trainer.gradient_clip_algorithm_ = "norm"
-    start = time.time()
     trainer.fit(module, train_dataloaders=train, val_dataloaders=val,
                 ckpt_path=resume_from)
-    # A max_steps stop inside an epoch does not trigger Lightning epoch-end validation.
     if cfg.trainer.get("max_steps", -1) > 0 and trainer.global_step % n_batches:
-        trainer.validate(module, dataloaders=val, verbose=True)
+        trainer.validate(module, dataloaders=val, verbose=False)
     save_pretrained(model, str(checkpoint_dir), cfg.model, filename="weights.pt")
-    record.update(status="completed", epochs=trainer.current_epoch,
-                  global_step=trainer.global_step, completed_full_epochs=trainer.global_step // len(train),
-                  fractional_epochs=trainer.global_step / len(train), elapsed_seconds=time.time()-start)
-    record["metrics"] = {k: float(v.detach().cpu()) for k,v in trainer.callback_metrics.items()
-                         if torch.is_tensor(v) and v.numel() == 1}
-    (run_dir / "run.json").write_text(json.dumps(record, indent=2))
-    print(json.dumps(record, indent=2), flush=True)
+    print("CHECKPOINT_SAVED", str(checkpoint_dir), flush=True)
 
 
 if __name__ == "__main__":
