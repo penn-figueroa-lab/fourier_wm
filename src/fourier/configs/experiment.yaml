@@ -1,0 +1,41 @@
+model_family: fourier
+dynamics_type: fourier
+benchmark: null
+seed: 42
+run_name: null
+checkpoint: null
+tasks: null
+resume_from: null
+history_len: null
+evaluation_batch_size: null
+training_overrides: []
+output:
+  save_video: false
+preparation:
+  catalog: null
+  archive: null
+  source: null
+  output: null
+  source_url: null
+  revision: null
+  expected_sha256: null
+  split: train
+  collect: false
+  episodes: null
+environment: null
+protocol: null
+planner: null
+dataset:
+  manifest: null
+  validation_manifest: null
+  id: null
+  regime: expert_train
+  frameskip: 5
+machine:
+  name: local
+  device: cuda
+  runs_root: ${oc.env:FOURIER_RUNS,./runs}
+  # null retains each upstream model's loader settings.
+  num_workers: null
+  allow_compute: true
+training_profile: null

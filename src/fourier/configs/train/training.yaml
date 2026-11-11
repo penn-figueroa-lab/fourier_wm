@@ -4,8 +4,8 @@ defaults:
 - /scripts/train/config/lewm@_global_
 - /model@fourier_model: fourier
 - _self_
-- override hydra/job_logging: disabled
-- override hydra/hydra_logging: disabled
+- override /hydra/job_logging: disabled
+- override /hydra/hydra_logging: disabled
 hydra:
   output_subdir: null
   job:
@@ -13,8 +13,8 @@ hydra:
   run:
     dir: .
   searchpath:
-  - file://./configs
-  - file://./stable-worldmodel
+  - file://${oc.env:FOURIER_CONFIG_ROOT}
+  - file://${oc.env:FOURIER_SWM_ROOT}
 model: ${fourier_model}
 # Checkpoint management is project-owned; model/data/loss settings stay upstream.
 resume_from: null

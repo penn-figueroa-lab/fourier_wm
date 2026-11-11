@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-11",
+  "release_ready": false,
+  "source_code_sha256": "b4c579d01ef6251c6af880c65e56de80a97488b88b5e1c2900e406ebd8bb70ee",
+  "upstream": {
+    "ok": true,
+    "expected_tree": "b4ea0f6e08ddd22c2fc74344de2f5577b9f563ed",
+    "manifest_tree": "b4ea0f6e08ddd22c2fc74344de2f5577b9f563ed",
+    "changed": [],
+    "checked_files": 357
+  },
+  "external_validation": {
+    "package": "fourier-wm-validation",
+    "version": "0.9.1",
+    "revision": "d747214a488d6b493f3742f9de9ec93746d51c32",
+    "wheel": "fourier_wm_validation-0.9.1-py3-none-any.whl",
+    "wheel_sha256": "80d021cc7e3c049486e4f08ce5a5989d87913dd0366d7eed65dff9fba5243346",
+    "acceptance_checks": {
+      "passed": 132,
+      "failed": 0,
+      "seconds": 97.13
+    },
+    "handoff_checks": {
+      "passed": 4,
+      "failed": 0,
+      "seconds": 3.87
+    }
+  },
+  "additional_checks": {
+    "formatting_preserves_ast": true,
+    "packaged_configs_and_licenses": true,
+    "locked_dependency_resolution": true,
+    "cwd_independent_checkpoint_doctor": true,
+    "documented_closed_loop_config_and_saved_tasks": true,
+    "live_frozen_source_comparison": {
+      "snapshots": 3,
+      "core_files_checked": 18,
+      "differences": 0
+    },
+    "dataset_free_tworoom_demo": {
+      "cem": {
+        "passed": true,
+        "steps": 2
+      },
+      "eight_start_gauss_newton_tvlqr": {
+        "passed": true,
+        "steps": 6
+      },
+      "outputs": "Side-by-side observation/goal GIF, actions and result records; not benchmark success rates"
+    }
+  },
+  "tworoom": {
+    "checkpoint_seeds": [
+      42,
+      43,
+      44
+    ],
+    "strict_load_and_finite_predictions": true,
+    "encoder_and_predictor_max_absolute_error_vs_frozen_source": 0.0,
+    "parity_input": "Deterministic synthetic pixel and command probe; not a complete evaluation parity claim",
+    "trained_checkpoint_simulator_smoke": [
+      "CEM",
+      "eight-start projected Gauss-Newton",
+      "eight-start Gauss-Newton with TV-LQR"
+    ],
+    "simulator_smoke_steps_per_controller": 3,
+    "training_source_sha256": "c4aee25dd8600d5a447889ef63813231da26679c94d1ce803823f075a816b447",
+    "evaluation_source_sha256": "c58bd88957950bceac1d22c3cff3c6ef263f857170a50c041d9efa253e3e94eb",
+    "training_objective": "One five-primitive-step endpoint per clip plus 0.09 SIGReg; not the requested three-endpoint experiment"
+  },
+  "limits": [
+    "Current checkout is newer than frozen PARCC training snapshots. Exact resume requires the original code/dependency identity and full resume checkpoint.",
+    "Local smoke checks do not rerun the complete 50-task benchmark or establish convergence or controller superiority.",
+    "Full release acceptance across all experimental environment adapters and cluster GPU configurations is incomplete. History-state dynamics support CEM; single-state SQP/TV-LQR cannot substitute."
+  ]
+}

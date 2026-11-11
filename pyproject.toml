@@ -5,13 +5,57 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "fourier-wm"
 version = "0.1.0"
-requires-python = ">=3.10"
-description = "Fourier dynamics and JAX SQP adapters for the vendored SWM"
-dependencies = ["torch", "numpy<2", "hydra-core", "stable-worldmodel", "stable-pretraining", "lightning", "scikit-learn"]
+requires-python = ">=3.11,<3.12"
+description = "Fourier dynamics and MPC adapters for the vendored Stable World Model"
+
+dependencies = [
+    "torch==2.11.0",
+    "torchvision==0.26.0",
+    "numpy<2",
+    "hydra-core",
+    "stable-worldmodel[train,data]",
+    "stable-pretraining==0.1.8",
+    "lightning>=2.6,<2.7",
+    "scikit-learn",
+    "torchdata==0.11.0",
+    "h5py",
+    "hdf5plugin",
+    "zstandard",
+    "pygame",
+    "pymunk",
+    "shapely",
+    "ogbench",
+    "dm-control",
+    "gymnasium-robotics",
+    "mujoco<3.12",
+    "opencv-python-headless<4.12",
+    "matplotlib",
+    "imageio[ffmpeg]",
+    "pyarrow>=19,<24",
+]
+
+[project.scripts]
+fourier-wm = "fourier.cli:main"
 
 [project.optional-dependencies]
 planning = ["jax[cpu]>=0.4.35"]
 test = ["pytest"]
 
+[[tool.uv.index]]
+name = "pytorch-cu128"
+url = "https://download.pytorch.org/whl/cu128"
+explicit = true
+
+[tool.uv.sources]
+torch = { index = "pytorch-cu128" }
+torchvision = { index = "pytorch-cu128" }
+stable-worldmodel = { path = "stable-worldmodel", editable = true }
+
+[tool.setuptools.package-data]
+fourier = ["configs/**/*.yaml", "assets/*.xml", "assets/*.txt", "upstream_files.json"]
+
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.ruff]
+line-length = 100

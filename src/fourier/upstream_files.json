@@ -1,0 +1,1430 @@
+{
+  ".github/workflows/tests.yaml": {
+    "mode": "100644",
+    "blob": "b58ab9adeaeae7216b2dc791a696c407ab17576a"
+  },
+  ".gitignore": {
+    "mode": "100644",
+    "blob": "e073e509faf5b97df37c2c9f2cd5486d9989c4ce"
+  },
+  ".pre-commit-config.yaml": {
+    "mode": "100644",
+    "blob": "4e9989038b179ce98049e796950a32bbf6e34981"
+  },
+  "LICENSE": {
+    "mode": "100644",
+    "blob": "35768c63562fdf8c4e44015b94f1b9b510d5106e"
+  },
+  "README.md": {
+    "mode": "100644",
+    "blob": "9589cbc7d72f16ee44fb7f85a1ea55e95a514d20"
+  },
+  "docs/api/buffer.md": {
+    "mode": "100644",
+    "blob": "0cebbc3b023ce5fa665818a39c6729f2d6cdb9d3"
+  },
+  "docs/api/dataset.md": {
+    "mode": "100644",
+    "blob": "599a51de831fe58cc60be98d4ba23a98f505f0a6"
+  },
+  "docs/api/planning.md": {
+    "mode": "100644",
+    "blob": "5cab210f0c00ccbedc305727e996eea83d9e3c16"
+  },
+  "docs/api/policy.md": {
+    "mode": "100644",
+    "blob": "7dfa68a1b163410f9938b5b87a68359ddae8ab06"
+  },
+  "docs/api/solver.md": {
+    "mode": "100644",
+    "blob": "f8858642f4e46c7a4314c89092e03870d60283f0"
+  },
+  "docs/api/spaces.md": {
+    "mode": "100644",
+    "blob": "8d7c9bce55e642a69478004aa2e4b9ee51c3eb2d"
+  },
+  "docs/api/world.md": {
+    "mode": "100644",
+    "blob": "ebbcb996cd2c5e04d1d4af8e43a8582c13f990b5"
+  },
+  "docs/api/wrapper.md": {
+    "mode": "100644",
+    "blob": "e977dbe4dc4a92c49b995ca04589f7efa08d7ba8"
+  },
+  "docs/assets/acrobot_10.gif": {
+    "mode": "100644",
+    "blob": "d303dca077b1d4b893e4de581fb66370b0ab0eb5"
+  },
+  "docs/assets/acrobot_control.gif": {
+    "mode": "100644",
+    "blob": "8596f1e0779be49320baf93189e253b6756625f8"
+  },
+  "docs/assets/acrobot_control_var.gif": {
+    "mode": "100644",
+    "blob": "c93097312bc4cff321f4c89fd2ba023fc5aabba4"
+  },
+  "docs/assets/ballincup.gif": {
+    "mode": "100644",
+    "blob": "d8af1b5f0e6aa66b7d001b6402b065088983368c"
+  },
+  "docs/assets/ballincup_var.gif": {
+    "mode": "100644",
+    "blob": "92a835b046de6c97b4c8ef005821cb65498c3306"
+  },
+  "docs/assets/cartpole.gif": {
+    "mode": "100644",
+    "blob": "6423c55bf7761242112cc7eebd65e73fa35e5718"
+  },
+  "docs/assets/cartpole_balance.gif": {
+    "mode": "100644",
+    "blob": "6139cac666c9c91bbabdf664152e0c24110431dc"
+  },
+  "docs/assets/cartpole_control.gif": {
+    "mode": "100644",
+    "blob": "250f57352201b88292bdbef8968fdbd509837690"
+  },
+  "docs/assets/cartpole_control_var.gif": {
+    "mode": "100644",
+    "blob": "c849de4bac294be2d678ec523ad8a7266e0f0a3b"
+  },
+  "docs/assets/cartpole_var.gif": {
+    "mode": "100644",
+    "blob": "38932ed38b45bc57fb663f4294ea850b459bf80d"
+  },
+  "docs/assets/cheetah.gif": {
+    "mode": "100644",
+    "blob": "ce1f2ab07213b4a1d8246f24de86c84907f5424e"
+  },
+  "docs/assets/cheetah_jump.gif": {
+    "mode": "100644",
+    "blob": "35ed430403acef79cc98922cd84bc9b1835a999a"
+  },
+  "docs/assets/cheetah_run.gif": {
+    "mode": "100644",
+    "blob": "75383298f884ae98aef98f9bd9a231dd1c5a120c"
+  },
+  "docs/assets/cheetah_var.gif": {
+    "mode": "100644",
+    "blob": "586a8739ff829b68aa04ded0328794fd74556757"
+  },
+  "docs/assets/craftax.gif": {
+    "mode": "100644",
+    "blob": "9a95013181889784bffb9035e211e385783d725f"
+  },
+  "docs/assets/craftax_classic.gif": {
+    "mode": "100644",
+    "blob": "856e7f3ff9f10d26f4799686c9fc73553d7f0b1b"
+  },
+  "docs/assets/cube.gif": {
+    "mode": "100644",
+    "blob": "60a098ae38488b3df5d00962c964a389bf581ecf"
+  },
+  "docs/assets/cube_fov.gif": {
+    "mode": "100644",
+    "blob": "c5e850858aa3617ce3319fff194c9a59442206fa"
+  },
+  "docs/assets/cup_catch.gif": {
+    "mode": "100644",
+    "blob": "c30191b08f4e038f525816d2fdf556e3b017c96a"
+  },
+  "docs/assets/cup_spin.gif": {
+    "mode": "100644",
+    "blob": "a41633e7100efc23c1f49280688e4c91c17a9a9e"
+  },
+  "docs/assets/envs_grid.gif": {
+    "mode": "100644",
+    "blob": "147394ddb7f899c02b1a627a01fc3d7d02690b1f"
+  },
+  "docs/assets/envs_grid_1.gif": {
+    "mode": "100644",
+    "blob": "1eddf4dee51087979cff88ef3b24c296b5b299b4"
+  },
+  "docs/assets/envs_grid_2.gif": {
+    "mode": "100644",
+    "blob": "8c77ccb1842e8709e8caea45d859521c8a65c419"
+  },
+  "docs/assets/fetch_pickandplace.gif": {
+    "mode": "100644",
+    "blob": "94b653962d66f44d6c557da5b74327f3771a8826"
+  },
+  "docs/assets/fetch_pickandplace_var.gif": {
+    "mode": "100644",
+    "blob": "2d3203ed9483a39cbc78f0cdf113397a0dedba29"
+  },
+  "docs/assets/fetch_push.gif": {
+    "mode": "100644",
+    "blob": "872313428cf2ce9159ffdcb02d9b244b26839a56"
+  },
+  "docs/assets/fetch_push_var.gif": {
+    "mode": "100644",
+    "blob": "52418388d5f18d19735669682a48646c4a98eb74"
+  },
+  "docs/assets/fetch_reach.gif": {
+    "mode": "100644",
+    "blob": "e9386b1078cba0c12053d46908b78625c7f44327"
+  },
+  "docs/assets/fetch_reach_var.gif": {
+    "mode": "100644",
+    "blob": "f4650e41975b7095d35cafd011c71a1bc3a96a48"
+  },
+  "docs/assets/fetch_slide.gif": {
+    "mode": "100644",
+    "blob": "b7807f4a2d80c73fec5f869a017d7099c75702de"
+  },
+  "docs/assets/fetch_slide_var.gif": {
+    "mode": "100644",
+    "blob": "0102e4e73ef02da06c3adf089767ed4d0b0d6377"
+  },
+  "docs/assets/finger.gif": {
+    "mode": "100644",
+    "blob": "964d23630529695f4d260a47f737faa72ea0ad64"
+  },
+  "docs/assets/finger_var.gif": {
+    "mode": "100644",
+    "blob": "30fd360974df6fcd4ccd7e4672d133ca0d15ea09"
+  },
+  "docs/assets/hooper_backward.gif": {
+    "mode": "100644",
+    "blob": "9ca82bf071a5ed0ccda61a46add75e9648a723e4"
+  },
+  "docs/assets/hopper.gif": {
+    "mode": "100644",
+    "blob": "093e121f57eaeaa1b6bc48309b1fba575a16899a"
+  },
+  "docs/assets/hopper_var.gif": {
+    "mode": "100644",
+    "blob": "8633575758d8a73482f9cb7011d881c61543a8d6"
+  },
+  "docs/assets/lewm-gpu-usage.png": {
+    "mode": "100644",
+    "blob": "2b880de761fe9e9426fdfc404d189dcecf87d97f"
+  },
+  "docs/assets/mountain_car_control.gif": {
+    "mode": "100644",
+    "blob": "c28361ce6a8cf8038cba40c37162a109e02d9161"
+  },
+  "docs/assets/mountain_car_control_var.gif": {
+    "mode": "100644",
+    "blob": "d091c8f944e6a02da89b4b140b255072b142c2b9"
+  },
+  "docs/assets/pendulum.gif": {
+    "mode": "100644",
+    "blob": "0e5a58be754d007a3a652cb08c23b445c7bceaa4"
+  },
+  "docs/assets/pendulum_control.gif": {
+    "mode": "100644",
+    "blob": "49df78cecaa5c603c71f56d5f1533d729d193e04"
+  },
+  "docs/assets/pendulum_control_var.gif": {
+    "mode": "100644",
+    "blob": "daf9fe2bb2d43d4369d9c97d8c5791cda990b81a"
+  },
+  "docs/assets/pendulum_spin.gif": {
+    "mode": "100644",
+    "blob": "0db54e630062c98beb38fcda5fb378321dc06eaf"
+  },
+  "docs/assets/pendulum_var.gif": {
+    "mode": "100644",
+    "blob": "1ad6a038ca46e722aef3bfdfbbf60e34e56f4f4e"
+  },
+  "docs/assets/pusht.gif": {
+    "mode": "100644",
+    "blob": "638c8aee539dc39bdbf1dcf78d7edb6b473efc9a"
+  },
+  "docs/assets/pusht_fov.gif": {
+    "mode": "100644",
+    "blob": "d9a1467c81148315f820ec614f8a3bccfd318b28"
+  },
+  "docs/assets/quadruped.gif": {
+    "mode": "100644",
+    "blob": "f34fcca060fa28a858740979a06bee060685d7b3"
+  },
+  "docs/assets/quadruped_var.gif": {
+    "mode": "100644",
+    "blob": "167c45bcdcdf507992ef299c7a6b06edceb9db08"
+  },
+  "docs/assets/reacher.gif": {
+    "mode": "100644",
+    "blob": "bd8cfe42bb356c2e66836561b52e9cbb0bcb0f48"
+  },
+  "docs/assets/reacher_var.gif": {
+    "mode": "100644",
+    "blob": "e77a2cf1f7e2b174785b8ae6b3daacbe4c768bbf"
+  },
+  "docs/assets/scene.gif": {
+    "mode": "100644",
+    "blob": "bf1a99f37272a26d9d8661b90fe5eb760e5d0515"
+  },
+  "docs/assets/scene_fov.gif": {
+    "mode": "100644",
+    "blob": "d49affa5ec0287b037f20982b5e418afb70f7a46"
+  },
+  "docs/assets/swingup.gif": {
+    "mode": "100644",
+    "blob": "74820adc16e01a8e2a2729608ab3f1149d9a2e60"
+  },
+  "docs/assets/tworoom.gif": {
+    "mode": "100644",
+    "blob": "b3188569523c34a9035edf2d34b94719e1a60d1d"
+  },
+  "docs/assets/tworoom_fov.gif": {
+    "mode": "100644",
+    "blob": "633c555a79a0c9dc289f36fbe64c32dcf50c629e"
+  },
+  "docs/assets/walker.gif": {
+    "mode": "100644",
+    "blob": "5b73b84b7357cd4a3770ece09339ab136a79cc80"
+  },
+  "docs/assets/walker_var.gif": {
+    "mode": "100644",
+    "blob": "c27397d16a705031219fed38045840afdd5d304b"
+  },
+  "docs/assets/wrapper_blur.gif": {
+    "mode": "100644",
+    "blob": "a06ebe315ee8176838196c587f4a35a3937f7847"
+  },
+  "docs/assets/wrapper_chromakey.gif": {
+    "mode": "100644",
+    "blob": "afaf2bef94bba3de058239ed6693a98fc42739a7"
+  },
+  "docs/assets/wrapper_colorjitter.gif": {
+    "mode": "100644",
+    "blob": "c4b5526f428c355c88727a006f18200f8ffa6915"
+  },
+  "docs/assets/wrapper_cutout.gif": {
+    "mode": "100644",
+    "blob": "5ca07a9e49ed3f4d7ae4095221eee39f60ee5da3"
+  },
+  "docs/assets/wrapper_grayscale.gif": {
+    "mode": "100644",
+    "blob": "7085bedd11fd863bb6a1eb2cafcab83e534ef14b"
+  },
+  "docs/assets/wrapper_moving_patch.gif": {
+    "mode": "100644",
+    "blob": "738bd5f56c9dc907fd9b7c74f11258506f828b57"
+  },
+  "docs/assets/wrapper_noise.gif": {
+    "mode": "100644",
+    "blob": "f4b7dd173b3a714bab4348977cd223e7c3dd68e4"
+  },
+  "docs/assets/wrapper_occlusion.gif": {
+    "mode": "100644",
+    "blob": "f3346cab8fdcdeeeffb337018c577062ce6af463"
+  },
+  "docs/assets/wrapper_random_conv.gif": {
+    "mode": "100644",
+    "blob": "cb3d2aac46fb930f8eaec98fcf1197e3ea5152a7"
+  },
+  "docs/assets/wrapper_random_shift.gif": {
+    "mode": "100644",
+    "blob": "902ff0959f58598a3fbfba4217979f9861ef54e4"
+  },
+  "docs/assets/wrapper_resolution.gif": {
+    "mode": "100644",
+    "blob": "d726a77ce463006cdd9b31a4946efd7768f70ea1"
+  },
+  "docs/baselines.md": {
+    "mode": "100644",
+    "blob": "25e69a3e648a31741500fe825382bac548bf4965"
+  },
+  "docs/cli.md": {
+    "mode": "100644",
+    "blob": "8d7003a93dd9130bac62ee66488b6ad19b43f909"
+  },
+  "docs/envs/ale.md": {
+    "mode": "100644",
+    "blob": "2970a04e27f651c833a4388572ba88a0f5d4f4f3"
+  },
+  "docs/envs/craftax.md": {
+    "mode": "100644",
+    "blob": "05d4face0c637037fed99a7733da34d46a585ef9"
+  },
+  "docs/envs/dmc.md": {
+    "mode": "100644",
+    "blob": "d3eb44109c818cceaddc9de75875aa100059846f"
+  },
+  "docs/envs/gymnasium_control.md": {
+    "mode": "100644",
+    "blob": "5cb6342301ef313f78ae70f5b30d9189bed72857"
+  },
+  "docs/envs/gymnasium_robotics.md": {
+    "mode": "100644",
+    "blob": "f51c80b271f535457f601973ffed5f61c188e191"
+  },
+  "docs/envs/ogb.md": {
+    "mode": "100644",
+    "blob": "2f24ec395d907b2170608b6525a66a19b40c856e"
+  },
+  "docs/envs/piecewise.md": {
+    "mode": "100644",
+    "blob": "90392015982087d71317462a90dbfca8e948f92a"
+  },
+  "docs/envs/pusht.md": {
+    "mode": "100644",
+    "blob": "dfc8a8854db167125d0812d0ba10dfcf0f57b281"
+  },
+  "docs/envs/tworoom.md": {
+    "mode": "100644",
+    "blob": "cd63cbeed05ee649c2eb6777e5fb8afa0a3381a3"
+  },
+  "docs/guides/checkpoints.md": {
+    "mode": "100644",
+    "blob": "e9fcb0ed0d097f4883cd5b4083040bee40d0f3e6"
+  },
+  "docs/guides/online_learning.md": {
+    "mode": "100644",
+    "blob": "7b257928fca449007581112dcc499a9c95e368f8"
+  },
+  "docs/index.md": {
+    "mode": "100644",
+    "blob": "fccbad0c47970421b953ba8e4c38ea0b9a72b810"
+  },
+  "docs/quick_start.md": {
+    "mode": "100644",
+    "blob": "40416e0349e15f4d406f1d3a8bfd762c1837aa9d"
+  },
+  "docs/tutorial/collect_data.md": {
+    "mode": "100644",
+    "blob": "c45d7145b0d2ca262a52889e3e55b550be2cd131"
+  },
+  "docs/tutorial/new_env.md": {
+    "mode": "100644",
+    "blob": "4729c39ee49b8151b583e6bb851ac88454c7f818"
+  },
+  "docs/tutorial/training_wm.md": {
+    "mode": "100644",
+    "blob": "f9411444980c8bb6f9a2d2168c1e3fa1fce0cf0f"
+  },
+  "mkdocs.yaml": {
+    "mode": "100644",
+    "blob": "0e2a759a163b52845019a6d2e0538a66274d6dfa"
+  },
+  "pyproject.toml": {
+    "mode": "100644",
+    "blob": "6dcc0c3d909d76776c6cd012bde0ded3fac6a831"
+  },
+  "scripts/benchmark/compare_h5_lance.py": {
+    "mode": "100644",
+    "blob": "0e5b75e2827d1ed7f5b2438dbad15c4b7218437d"
+  },
+  "scripts/benchmark/configs/benchmark.yaml": {
+    "mode": "100644",
+    "blob": "f0188b0c8cba5d32beb28f27870f5fecbf5a9d4b"
+  },
+  "scripts/benchmark/convert.py": {
+    "mode": "100644",
+    "blob": "2d26ed6b078d6d65042270a68f9152d232cf1453"
+  },
+  "scripts/data/collect_antmaze.py": {
+    "mode": "100644",
+    "blob": "1d024ffbff6da6af1adfc8d9dfcb99bec8efe4b0"
+  },
+  "scripts/data/collect_cube.py": {
+    "mode": "100644",
+    "blob": "453c9d0ba87f5c6d64d03cb42d1210ab2b5c623d"
+  },
+  "scripts/data/collect_dmc.py": {
+    "mode": "100644",
+    "blob": "eeb349069ca1f6da441b79bed893d73a19ad7bf5"
+  },
+  "scripts/data/collect_pointmaze.py": {
+    "mode": "100644",
+    "blob": "6337910a1c01c109794f9dfa32998be307692b99"
+  },
+  "scripts/data/collect_pusht_fov.py": {
+    "mode": "100644",
+    "blob": "da853b4061178df3bb473ec742c5e746cbb06431"
+  },
+  "scripts/data/collect_pusht_toy.py": {
+    "mode": "100644",
+    "blob": "919c5dc8bdc6728c67438f4e824ce860027586f4"
+  },
+  "scripts/data/collect_reacher.py": {
+    "mode": "100644",
+    "blob": "ccfa9a1332fda9da17a28c2031b79f2411c04a5d"
+  },
+  "scripts/data/collect_scene.py": {
+    "mode": "100644",
+    "blob": "d29af9c4210c269bc64d5e64dcfae462bb3335bf"
+  },
+  "scripts/data/collect_tworooms.py": {
+    "mode": "100644",
+    "blob": "ab266ba67ada56dd7eb58f45ab372e8f1e111001"
+  },
+  "scripts/data/collect_tworooms_single_var.py": {
+    "mode": "100644",
+    "blob": "43b101e81ab4a07750a146ce1f9db6d5b4b35107"
+  },
+  "scripts/data/collect_weak_discrete_pusht.py": {
+    "mode": "100644",
+    "blob": "def0d58e5491a8affb93bc2fa73faf01ea83ee5c"
+  },
+  "scripts/data/collect_weak_pusht.py": {
+    "mode": "100644",
+    "blob": "7c0c99fd4fc79e3a6ae2c188e55f4f90cd90da81"
+  },
+  "scripts/data/config/default.yaml": {
+    "mode": "100644",
+    "blob": "3080e6f12022c1bfdd5c9de8f16edd8460c6870e"
+  },
+  "scripts/data/config/dmc.yaml": {
+    "mode": "100644",
+    "blob": "6aef7d8e2b1713b900071112e0963ad2473bcc5d"
+  },
+  "scripts/data/config/launcher/local.yaml": {
+    "mode": "100644",
+    "blob": "9a9fb3e2ddda2d13dc1e51830b41da9aecff14d1"
+  },
+  "scripts/data/config/launcher/slurm_cpu.yaml": {
+    "mode": "100644",
+    "blob": "59472a0e749120d9bb9770ea9ff4320ffedee76a"
+  },
+  "scripts/data/config/ogb.yaml": {
+    "mode": "100644",
+    "blob": "23cd13814b8282038d47e23d9b3fd87c51780bbb"
+  },
+  "scripts/data/config/reacher.yaml": {
+    "mode": "100644",
+    "blob": "f000aaf129cfb3a78676f9388455444b68af5b48"
+  },
+  "scripts/data/convert.py": {
+    "mode": "100644",
+    "blob": "912a3f91c65d73cbba147d3e18f42c94054119cc"
+  },
+  "scripts/examples/breakout.py": {
+    "mode": "100644",
+    "blob": "7e2c55a348205609705c8c33b2d12003462e3322"
+  },
+  "scripts/examples/dmc.py": {
+    "mode": "100644",
+    "blob": "a0397ac16ddd46e96e3134147a8c9c6aa044a09a"
+  },
+  "scripts/expert/config/tdmpc2_online.yaml": {
+    "mode": "100644",
+    "blob": "1b75968aafce81cb42fdfc1a66af765a54602335"
+  },
+  "scripts/expert/sac_online.py": {
+    "mode": "100644",
+    "blob": "ca2906045f87951e08d91ed7c03cd253ce3346c3"
+  },
+  "scripts/expert/tdmpc2_online.py": {
+    "mode": "100644",
+    "blob": "bb677f487b48007ac0434ccdc19275bdae692a47"
+  },
+  "scripts/expert/train_fetch_policy.py": {
+    "mode": "100644",
+    "blob": "d0dcb6a8699ebecb05cc5a520fc40e9deca383e5"
+  },
+  "scripts/minerl.sh": {
+    "mode": "100644",
+    "blob": "1217071460e14aabbb3b360ff875b0c4cc63a1d9"
+  },
+  "scripts/notebooks/train_from_hf_buckets.ipynb": {
+    "mode": "100644",
+    "blob": "059208ea5ce6dbfa07f9a854cf767badb48201bf"
+  },
+  "scripts/plan/config/cube.yaml": {
+    "mode": "100644",
+    "blob": "c194a32de23bbbadbf4c0732ef1f00bf6368b75b"
+  },
+  "scripts/plan/config/launcher/local.yaml": {
+    "mode": "100644",
+    "blob": "a1c7f4bb7fc79dc61596de2cef5f823cd29c0782"
+  },
+  "scripts/plan/config/objective/goal_mse.yaml": {
+    "mode": "100644",
+    "blob": "e7ca44f34f277ca231ab9e61b72e66dc34c5e795"
+  },
+  "scripts/plan/config/objective/goal_mse_pixels.yaml": {
+    "mode": "100644",
+    "blob": "5b44dcac72594c6d66b21865b40a2901d5bc776e"
+  },
+  "scripts/plan/config/objective/goal_mse_pixels_proprio.yaml": {
+    "mode": "100644",
+    "blob": "06530b9cab4e4597d947562f7b07c8a2bf19e5fb"
+  },
+  "scripts/plan/config/pusht.yaml": {
+    "mode": "100644",
+    "blob": "156fee1487940b5077412941908ac04a2b10c90a"
+  },
+  "scripts/plan/config/reacher.yaml": {
+    "mode": "100644",
+    "blob": "2124f21f6bc7bf6d5b879f971007c86c8fd56dcb"
+  },
+  "scripts/plan/config/solver/adam.yaml": {
+    "mode": "100644",
+    "blob": "86e0769389f38b368cd4bd549f6b5f0cfe63931f"
+  },
+  "scripts/plan/config/solver/cem.yaml": {
+    "mode": "100644",
+    "blob": "56ca17556a28fe041405b847106315b4cba6786e"
+  },
+  "scripts/plan/config/tworoom.yaml": {
+    "mode": "100644",
+    "blob": "7b2570fba55986f8b413e6ecb26300a29865cd86"
+  },
+  "scripts/plan/eval_ff.py": {
+    "mode": "100644",
+    "blob": "5e81fda94636a1fc2710eb47b32821189d502a63"
+  },
+  "scripts/plan/eval_wm.py": {
+    "mode": "100644",
+    "blob": "49dd4f92ada9769f93a8a811a771dcad29fe6ddd"
+  },
+  "scripts/train/config/data/dmc.yaml": {
+    "mode": "100644",
+    "blob": "9c2e6ff9f14f2f305ec59937484bbd726f2d4373"
+  },
+  "scripts/train/config/data/ogb.yaml": {
+    "mode": "100644",
+    "blob": "e9c6952bfad8ae9532279f9e3b02fc74cc3cdfc3"
+  },
+  "scripts/train/config/data/pusht.yaml": {
+    "mode": "100644",
+    "blob": "52e185cc3bdf0e20261763c7115dfe0bcaf74088"
+  },
+  "scripts/train/config/data/pusht_genie.yaml": {
+    "mode": "100644",
+    "blob": "95a8cc163434474e545c1536c48154acb3ad4356"
+  },
+  "scripts/train/config/data/tworoom.yaml": {
+    "mode": "100644",
+    "blob": "b881b4d575deaa3c8db4ecc4e58b743a51c7a7ed"
+  },
+  "scripts/train/config/gcbc.yaml": {
+    "mode": "100644",
+    "blob": "18fa09943cc8768ebf644fc5246e93bba520949f"
+  },
+  "scripts/train/config/gciql.yaml": {
+    "mode": "100644",
+    "blob": "550bed0d8e1670fd999f47ec658a0907b82a6254"
+  },
+  "scripts/train/config/gcivl.yaml": {
+    "mode": "100644",
+    "blob": "f81653b1d64f5b31a70f415e567f388f8b7d4570"
+  },
+  "scripts/train/config/genie.yaml": {
+    "mode": "100644",
+    "blob": "d4c811285741e2be6fe0ff00c9cb771c8da49c9f"
+  },
+  "scripts/train/config/hilp.yaml": {
+    "mode": "100644",
+    "blob": "05d078b05a9e5d582970ba5644e4c99cf1419e61"
+  },
+  "scripts/train/config/launcher/local.yaml": {
+    "mode": "100644",
+    "blob": "9de18944dbfae8bf9915c22424160c61c811ccd8"
+  },
+  "scripts/train/config/lewm.yaml": {
+    "mode": "100644",
+    "blob": "83d50a9d84c36b75b11f0a43b4b2791a214cfad1"
+  },
+  "scripts/train/config/pldm.yaml": {
+    "mode": "100644",
+    "blob": "770f06951b540b5d33d845a60e6db18cfcb95b72"
+  },
+  "scripts/train/config/prejepa.yaml": {
+    "mode": "100644",
+    "blob": "2f9a6754df35ae718741f4d51402091827dddfa3"
+  },
+  "scripts/train/config/tdmpc2.yaml": {
+    "mode": "100644",
+    "blob": "c0cb775d2fd86e28800a9edf1281b1e47518ee54"
+  },
+  "scripts/train/gcbc.py": {
+    "mode": "100644",
+    "blob": "7b3cdee9e1104c68706712972d8041b3edcb0791"
+  },
+  "scripts/train/gciql.py": {
+    "mode": "100644",
+    "blob": "7e77671bdd68427a4601855e7ea229be1e48e6c8"
+  },
+  "scripts/train/gcivl.py": {
+    "mode": "100644",
+    "blob": "6d98896fd810a46a6f5332590184c4c567122dca"
+  },
+  "scripts/train/genie.py": {
+    "mode": "100644",
+    "blob": "8f88a6b4e5281f889d56d08daffcf87ab2358473"
+  },
+  "scripts/train/hilp.py": {
+    "mode": "100644",
+    "blob": "2e1be31b652ee7e6cc323892cf2a62e17ed8a117"
+  },
+  "scripts/train/lewm.py": {
+    "mode": "100644",
+    "blob": "ca2d11f568f084de346f885cad1828df5ce50e19"
+  },
+  "scripts/train/pldm.py": {
+    "mode": "100644",
+    "blob": "7ae8caf6bb43c64c4d0b0eb7add1fcab4993e5d9"
+  },
+  "scripts/train/prejepa.py": {
+    "mode": "100644",
+    "blob": "45069dccbd2f73e2ae3b452589df35005fe04564"
+  },
+  "scripts/train/tdmpc2.py": {
+    "mode": "100644",
+    "blob": "593e61111ec997ddc18a19432cd28cdf411d3987"
+  },
+  "scripts/visualization/configs/config_datasets.yaml": {
+    "mode": "100644",
+    "blob": "ded0b318fb98dfcaff37c1854789b2f4b73b8b85"
+  },
+  "scripts/visualization/configs/config_envs.yaml": {
+    "mode": "100644",
+    "blob": "8d225a2e4f44ed1d1393f858b57ede80d8ce665f"
+  },
+  "scripts/visualization/configs/config_trajectories.yaml": {
+    "mode": "100644",
+    "blob": "7df86a0fbf0ab77e6a8e21223abe5a23839c3696"
+  },
+  "scripts/visualization/configs/config_value.yaml": {
+    "mode": "100644",
+    "blob": "a31ef93a1055c11594bea2e53c7c5bb473ee7b74"
+  },
+  "scripts/visualization/configs/world_model/backbone/dinov2_small.yaml": {
+    "mode": "100644",
+    "blob": "cce5867419fa49439581e4ec1c11ff2c32d229d0"
+  },
+  "scripts/visualization/configs/world_model/backbone/dinov3_small.yaml": {
+    "mode": "100644",
+    "blob": "6d2138751632a5432e049f1de9a9bc3726094919"
+  },
+  "scripts/visualization/configs/world_model/backbone/mae_base.yaml": {
+    "mode": "100644",
+    "blob": "0b157afbd3721096827fd367695d92b2d3791e06"
+  },
+  "scripts/visualization/configs/world_model/backbone/siglip2_base_224.yaml": {
+    "mode": "100644",
+    "blob": "3d680f3a0def634e48205d28b3f12e680445234b"
+  },
+  "scripts/visualization/configs/world_model/iql.yaml": {
+    "mode": "100644",
+    "blob": "c67ac55274ce5425107966c8d614e1f366bffcbf"
+  },
+  "scripts/visualization/configs/world_model/lewm.yaml": {
+    "mode": "100644",
+    "blob": "1a740d2dc6b37219a4aa602957df8c8f38efad3e"
+  },
+  "scripts/visualization/configs/world_model/prejepa.yaml": {
+    "mode": "100644",
+    "blob": "c80938e94b58347d3ec71a13929a75fb6efa19bf"
+  },
+  "scripts/visualization/configs/world_model/prejepa_action_only.yaml": {
+    "mode": "100644",
+    "blob": "3fc0d52ae12f6420ec1e5ec4aae997eb9456901b"
+  },
+  "scripts/visualization/utils.py": {
+    "mode": "100644",
+    "blob": "5084e6dcf8714e90a5a7ed6b7a305a2c8c3b8c63"
+  },
+  "scripts/visualization/visualize_dataset.py": {
+    "mode": "100644",
+    "blob": "97c6f17107144919f531342f1aedb112762cee72"
+  },
+  "scripts/visualization/visualize_env.py": {
+    "mode": "100644",
+    "blob": "ea40497fbd5697766e78e0e83440023893814241"
+  },
+  "scripts/visualization/visualize_trajectories.py": {
+    "mode": "100644",
+    "blob": "bc533f657eb18c6dbc3d53774477c72e427c3628"
+  },
+  "scripts/visualization/visualize_value_function.py": {
+    "mode": "100644",
+    "blob": "183b687d878a1ec5ce88f4592591287eddce19ad"
+  },
+  "stable_worldmodel/__init__.py": {
+    "mode": "100644",
+    "blob": "8fe9ada53c51554f433c29d4bc7713810d7e5b56"
+  },
+  "stable_worldmodel/buffer.py": {
+    "mode": "100644",
+    "blob": "2ec5780c61477f5e5ab4ccb6c8c861f5ea4a9b0c"
+  },
+  "stable_worldmodel/cli.py": {
+    "mode": "100644",
+    "blob": "51fc7b16f619c647cc72b1ae3eb0639628e5846f"
+  },
+  "stable_worldmodel/data/__init__.py": {
+    "mode": "100644",
+    "blob": "3cadb358e977466f84459853a414ac7471be7eb6"
+  },
+  "stable_worldmodel/data/buffer.py": {
+    "mode": "100644",
+    "blob": "ff4ec82a5dda8e0c4e98c044616b9c257ffe50f3"
+  },
+  "stable_worldmodel/data/dataset.py": {
+    "mode": "100644",
+    "blob": "fe42a6d3e0bf8c3f3b1f3350b40406eedbc29d01"
+  },
+  "stable_worldmodel/data/format.py": {
+    "mode": "100644",
+    "blob": "d4759c73081c3f6a1b2e504cdc69a81b4ae804e6"
+  },
+  "stable_worldmodel/data/formats/__init__.py": {
+    "mode": "100644",
+    "blob": "b00803be9dd051a82369c3957ddad604b944eaa5"
+  },
+  "stable_worldmodel/data/formats/folder.py": {
+    "mode": "100644",
+    "blob": "c2b363020b9a4bfa67ba42d75f66f818bb13db84"
+  },
+  "stable_worldmodel/data/formats/hdf5.py": {
+    "mode": "100644",
+    "blob": "f7f4cf7ef39abdff02347208e84811965c19fa32"
+  },
+  "stable_worldmodel/data/formats/lance.py": {
+    "mode": "100644",
+    "blob": "ff75918d83671458710bcdb60e7e581ad3109af4"
+  },
+  "stable_worldmodel/data/formats/lance_video.py": {
+    "mode": "100644",
+    "blob": "cf050c26494152d80177e79caada426fabcec02e"
+  },
+  "stable_worldmodel/data/formats/lerobot.py": {
+    "mode": "100644",
+    "blob": "1f6af0f867edd4e43d54ec495668b0ffad76be57"
+  },
+  "stable_worldmodel/data/formats/utils.py": {
+    "mode": "100644",
+    "blob": "003bac7ce4c6dccda9bc0e88ae6d705c47ff4669"
+  },
+  "stable_worldmodel/data/formats/video.py": {
+    "mode": "100644",
+    "blob": "0f2c0716da804f884584225765f6be74158d9e57"
+  },
+  "stable_worldmodel/data/normalization.py": {
+    "mode": "100644",
+    "blob": "6485ee63643cd07065840011431904e2a9bb2558"
+  },
+  "stable_worldmodel/data/utils.py": {
+    "mode": "100644",
+    "blob": "ca05dd115fc2812c2d21cdb62e09099d7912cc6a"
+  },
+  "stable_worldmodel/envs/__init__.py": {
+    "mode": "100644",
+    "blob": "dc161704241fb927e03e9cf70b1a18eb5edfe386"
+  },
+  "stable_worldmodel/envs/ale/__init__.py": {
+    "mode": "100644",
+    "blob": "94c98739b2eb285cd8025b113ecc08ab333221a8"
+  },
+  "stable_worldmodel/envs/craftax/__init__.py": {
+    "mode": "100644",
+    "blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+  },
+  "stable_worldmodel/envs/craftax/craftax.py": {
+    "mode": "100644",
+    "blob": "54cc0e3cf9735eacfc1335de82697fd8641f4e60"
+  },
+  "stable_worldmodel/envs/dmcontrol/__init__.py": {
+    "mode": "100644",
+    "blob": "0b1555abb340462f398c492b76be2cdb491eb054"
+  },
+  "stable_worldmodel/envs/dmcontrol/acrobot.py": {
+    "mode": "100644",
+    "blob": "0a808b941623cae33d1aad6b69e65ff02edb0e96"
+  },
+  "stable_worldmodel/envs/dmcontrol/ball_in_cup.py": {
+    "mode": "100644",
+    "blob": "0a0d86e2b7999ca4ee80757352962883681ef8e1"
+  },
+  "stable_worldmodel/envs/dmcontrol/cartpole.py": {
+    "mode": "100644",
+    "blob": "0b0e2d8d4e03b0ede5e1d2831889433bb3d217d3"
+  },
+  "stable_worldmodel/envs/dmcontrol/cheetah.py": {
+    "mode": "100644",
+    "blob": "f40d75b308362ea6569c79d159113f7a84cf601b"
+  },
+  "stable_worldmodel/envs/dmcontrol/custom_tasks/cheetah.py": {
+    "mode": "100644",
+    "blob": "a24672734cc037d7c49ab761e9bff68f998dbf81"
+  },
+  "stable_worldmodel/envs/dmcontrol/custom_tasks/hopper.py": {
+    "mode": "100644",
+    "blob": "4e86c0d4e55c5598f5059207c2c60bcec9c25121"
+  },
+  "stable_worldmodel/envs/dmcontrol/custom_tasks/reacher.py": {
+    "mode": "100644",
+    "blob": "a3277969328dcae3369e5decc582e31d318548c0"
+  },
+  "stable_worldmodel/envs/dmcontrol/custom_tasks/walker.py": {
+    "mode": "100644",
+    "blob": "a68ab95e795ffc69da63bd3a0abfd2d3888ec1e0"
+  },
+  "stable_worldmodel/envs/dmcontrol/dmcontrol.py": {
+    "mode": "100644",
+    "blob": "7b5693a6f9b37f6469298bf6f7ffac9baba4bc81"
+  },
+  "stable_worldmodel/envs/dmcontrol/expert_policy.py": {
+    "mode": "100644",
+    "blob": "f45c64d970c7bdd2298f98957cb4fee6050a77ec"
+  },
+  "stable_worldmodel/envs/dmcontrol/finger.py": {
+    "mode": "100644",
+    "blob": "4c0f12ffdc9528cc1b0ff0574a0e759fea208f4f"
+  },
+  "stable_worldmodel/envs/dmcontrol/hopper.py": {
+    "mode": "100644",
+    "blob": "878ba7c7e3f3c77814fadc2c8bbe91c716bd216c"
+  },
+  "stable_worldmodel/envs/dmcontrol/humanoid.py": {
+    "mode": "100644",
+    "blob": "e42ae5fc89230aa659a9e6af0e3aa557d8f0fa36"
+  },
+  "stable_worldmodel/envs/dmcontrol/manipulator.py": {
+    "mode": "100644",
+    "blob": "c4ca7b734152c1f236e17e294e6a3ffd979f33df"
+  },
+  "stable_worldmodel/envs/dmcontrol/pendulum.py": {
+    "mode": "100644",
+    "blob": "6d96cc86b922424db465db45b8cc3b4fbd04847c"
+  },
+  "stable_worldmodel/envs/dmcontrol/quadruped.py": {
+    "mode": "100644",
+    "blob": "924f463fdb9ed8d134a25d7357aaa67eae40b62f"
+  },
+  "stable_worldmodel/envs/dmcontrol/reacher.py": {
+    "mode": "100644",
+    "blob": "fc3c12759c7a101adebc10d66f92c4ab161a8315"
+  },
+  "stable_worldmodel/envs/dmcontrol/walker.py": {
+    "mode": "100644",
+    "blob": "57fd0b7ba1543b5c5bc030fc47bfd77c82a082a7"
+  },
+  "stable_worldmodel/envs/gymnasium_control/__init__.py": {
+    "mode": "100644",
+    "blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+  },
+  "stable_worldmodel/envs/gymnasium_control/acrobot.py": {
+    "mode": "100644",
+    "blob": "1e58be748fe279c65674f02c1f8236bcd90d96e2"
+  },
+  "stable_worldmodel/envs/gymnasium_control/base.py": {
+    "mode": "100644",
+    "blob": "ecd4cc3bd3e2250a06d43f029bb40aec6ef4500f"
+  },
+  "stable_worldmodel/envs/gymnasium_control/cartpole.py": {
+    "mode": "100644",
+    "blob": "51e8be8cc4dda640a2f4227fa8b7aa44d95a2c1c"
+  },
+  "stable_worldmodel/envs/gymnasium_control/mountain_car.py": {
+    "mode": "100644",
+    "blob": "5debc46f3fef6ef5e063a3d6248a0877d8691018"
+  },
+  "stable_worldmodel/envs/gymnasium_control/pendulum.py": {
+    "mode": "100644",
+    "blob": "754ed51ea812d081ef29e68caf9744d58c0f7e10"
+  },
+  "stable_worldmodel/envs/gymnasium_robotics/__init__.py": {
+    "mode": "100644",
+    "blob": "bbb7faab4884817dd27fb5a860edbc94c4927884"
+  },
+  "stable_worldmodel/envs/gymnasium_robotics/fetch.py": {
+    "mode": "100644",
+    "blob": "7fa9ec76905f243eef989b9dc618c8cab68664eb"
+  },
+  "stable_worldmodel/envs/image_positioning.py": {
+    "mode": "100644",
+    "blob": "36621dc59c53b26d00af37b882c5ecf9dfd3f19f"
+  },
+  "stable_worldmodel/envs/ogbench/__init__.py": {
+    "mode": "100644",
+    "blob": "bd67fbbea6e673f61736e25d0cb15afc107cc67c"
+  },
+  "stable_worldmodel/envs/ogbench/cube_env.py": {
+    "mode": "100644",
+    "blob": "3faef9b30ddaaab607f1f1a0efd08bfd4b757e83"
+  },
+  "stable_worldmodel/envs/ogbench/expert_policy.py": {
+    "mode": "100644",
+    "blob": "c36ba7a9597999d581288a77057a1205c0dc14d1"
+  },
+  "stable_worldmodel/envs/ogbench/maze_env.py": {
+    "mode": "100644",
+    "blob": "48ea70e7d6aee99d7beab39ddff334cd174ac24a"
+  },
+  "stable_worldmodel/envs/ogbench/scene_env.py": {
+    "mode": "100644",
+    "blob": "ad5ef5c2388ded2b45181824deaacaf1ee1a6705"
+  },
+  "stable_worldmodel/envs/piecewise/expert_policy.py": {
+    "mode": "100644",
+    "blob": "a67632ef1d49dc138acb5ab9979735d0e7196c42"
+  },
+  "stable_worldmodel/envs/piecewise/piecewise_env.py": {
+    "mode": "100644",
+    "blob": "2647aa37024ccd75f9b689aa02f035c18a77afff"
+  },
+  "stable_worldmodel/envs/pusht/__init__.py": {
+    "mode": "100644",
+    "blob": "4e6bcd5ad8b18c70a12b7f2d719a511ec1d1c091"
+  },
+  "stable_worldmodel/envs/pusht/env.py": {
+    "mode": "100644",
+    "blob": "38d8c7f2a11575954418df08e480fbe9d84277d5"
+  },
+  "stable_worldmodel/envs/pusht/env_discrete.py": {
+    "mode": "100644",
+    "blob": "224aaee56ef9515438b7dd27316608b12744dc89"
+  },
+  "stable_worldmodel/envs/pusht/expert_policy.py": {
+    "mode": "100644",
+    "blob": "9517673aaad42296d7ddd5914b135cb5498c6899"
+  },
+  "stable_worldmodel/envs/quantizer.py": {
+    "mode": "100644",
+    "blob": "4d31ab10633eac3179cc30e48ea44386c784b895"
+  },
+  "stable_worldmodel/envs/robocasa.py": {
+    "mode": "100644",
+    "blob": "cd34bde322a6fe7322a091a38ae59f1ee2fb26c4"
+  },
+  "stable_worldmodel/envs/rocket_landing/__init__.py": {
+    "mode": "100644",
+    "blob": "236699533731f9f05f3fcc5373a20573a0e6ee44"
+  },
+  "stable_worldmodel/envs/rocket_landing/expert_policy.py": {
+    "mode": "100644",
+    "blob": "aa5d85f3943d757bf10a49373db2520a923e1531"
+  },
+  "stable_worldmodel/envs/rocket_landing/pyflyt_rocketlanding.py": {
+    "mode": "100644",
+    "blob": "13306a9e9ac9e9e678f20e8a7dc38e7e2923c0cb"
+  },
+  "stable_worldmodel/envs/simple_point_maze.py": {
+    "mode": "100644",
+    "blob": "23d0a24125ae07e311f196eb457b8d77593e8427"
+  },
+  "stable_worldmodel/envs/two_room/__init__.py": {
+    "mode": "100644",
+    "blob": "134b9fe46b6143949b3eb0e37169dfcf8fe216e6"
+  },
+  "stable_worldmodel/envs/two_room/env.py": {
+    "mode": "100644",
+    "blob": "c314a1f57db90b49bafdaf35484df91958ad7f17"
+  },
+  "stable_worldmodel/envs/two_room/expert_policy.py": {
+    "mode": "100644",
+    "blob": "d35f61114fce518bfd047c8ba1d6fab2a1b43327"
+  },
+  "stable_worldmodel/envs/two_room/legacy_env.py": {
+    "mode": "100644",
+    "blob": "6109a2c312b86555da569fb6310766160d287a6d"
+  },
+  "stable_worldmodel/envs/utils.py": {
+    "mode": "100644",
+    "blob": "565b2abf16ed6c73a91c1a329d5007077afc8507"
+  },
+  "stable_worldmodel/planning/__init__.py": {
+    "mode": "100644",
+    "blob": "6d21750661efa56c26b1dcdb3fb2317ed58cfa99"
+  },
+  "stable_worldmodel/planning/evaluator.py": {
+    "mode": "100644",
+    "blob": "1d86034be3f61b7ca9a59ee9fde672ef929909ad"
+  },
+  "stable_worldmodel/planning/objective.py": {
+    "mode": "100644",
+    "blob": "09bb9d5624180f92f86023594c5110f722233e08"
+  },
+  "stable_worldmodel/planning/solver/__init__.py": {
+    "mode": "100644",
+    "blob": "8fa7a589767980622fed6b603422eed310cd929a"
+  },
+  "stable_worldmodel/planning/solver/callbacks/__init__.py": {
+    "mode": "100644",
+    "blob": "d93af93cc9d842a453c8dc3109a167a6eaec6bf0"
+  },
+  "stable_worldmodel/planning/solver/callbacks/cem.py": {
+    "mode": "100644",
+    "blob": "d6d098a79fb5a790b8294ae1f4209a78ba233dfd"
+  },
+  "stable_worldmodel/planning/solver/callbacks/common.py": {
+    "mode": "100644",
+    "blob": "c3c4fe000fb9b9054a3007cd9eccf1b5bad3b40c"
+  },
+  "stable_worldmodel/planning/solver/callbacks/gd.py": {
+    "mode": "100644",
+    "blob": "19d2454cbfebac63668793cfc5fc9512d5ef543b"
+  },
+  "stable_worldmodel/planning/solver/categorical_cem.py": {
+    "mode": "100644",
+    "blob": "33f4675e5d04e938ef2962638d4f93bfccde7ba4"
+  },
+  "stable_worldmodel/planning/solver/cem.py": {
+    "mode": "100644",
+    "blob": "e281a0477aece7e29ca343639f18c2c96a22871d"
+  },
+  "stable_worldmodel/planning/solver/gd.py": {
+    "mode": "100644",
+    "blob": "54a2154d0a374dedc64b56c88124ea52cbb1c118"
+  },
+  "stable_worldmodel/planning/solver/icem.py": {
+    "mode": "100644",
+    "blob": "1519c6bc6ad98a002cabb322497326f4851a47ca"
+  },
+  "stable_worldmodel/planning/solver/lagrangian.py": {
+    "mode": "100644",
+    "blob": "bdb5063376a267384147ab62ede1f69b0f333361"
+  },
+  "stable_worldmodel/planning/solver/mppi.py": {
+    "mode": "100644",
+    "blob": "b5d71fa3d6c7ce8d324abcfab78a1b8882791e1a"
+  },
+  "stable_worldmodel/planning/solver/pgd.py": {
+    "mode": "100644",
+    "blob": "ab3840a06512380bb0dc93e5dee39cb2d6eaa6f9"
+  },
+  "stable_worldmodel/planning/solver/predictive_sampling.py": {
+    "mode": "100644",
+    "blob": "5e9b227c9b54484d0a76a3359825d1a40ee73a90"
+  },
+  "stable_worldmodel/planning/solver/solver.py": {
+    "mode": "100644",
+    "blob": "ed7c8f775635991ad9780d4b45517408b3afbbeb"
+  },
+  "stable_worldmodel/planning/solver/utils.py": {
+    "mode": "100644",
+    "blob": "f02cb5b89bfddb1d13a30f198982117e69eade1c"
+  },
+  "stable_worldmodel/plot/__init__.py": {
+    "mode": "100644",
+    "blob": "4d8a1028c6e2d4a9dd00af2f439630c6e4de1078"
+  },
+  "stable_worldmodel/plot/video_utils.py": {
+    "mode": "100644",
+    "blob": "e5e8aac46ba68ee6b834de595508e83ab85a64a0"
+  },
+  "stable_worldmodel/policy.py": {
+    "mode": "100644",
+    "blob": "ef94c3d1a25c35a0a67715bb7babc44988826c37"
+  },
+  "stable_worldmodel/protocols.py": {
+    "mode": "100644",
+    "blob": "1e5b0dfe384d7cc3d861b8fa9194ad67e7a00545"
+  },
+  "stable_worldmodel/spaces.py": {
+    "mode": "100644",
+    "blob": "350078db19291239e9f776e2c89c7b7d794708c8"
+  },
+  "stable_worldmodel/utils.py": {
+    "mode": "100644",
+    "blob": "7dabccd690a0c69a9df7c63292fff81a63074c5e"
+  },
+  "stable_worldmodel/wm/__init__.py": {
+    "mode": "100644",
+    "blob": "947fb38c6f16f373efe9909c8b8cf0c93e465a4e"
+  },
+  "stable_worldmodel/wm/gcrl/__init__.py": {
+    "mode": "100644",
+    "blob": "03eeb70688016fe8af4c65462d292406575d254b"
+  },
+  "stable_worldmodel/wm/gcrl/gcrl.py": {
+    "mode": "100644",
+    "blob": "66e09824b43e7f2877df2c40b7c553a9b515bfb7"
+  },
+  "stable_worldmodel/wm/gcrl/module.py": {
+    "mode": "100644",
+    "blob": "b6b81f27100baf96030e7ed48844540af0062afa"
+  },
+  "stable_worldmodel/wm/genie/__init__.py": {
+    "mode": "100644",
+    "blob": "253063663411232911916aa40697dc41d565d77d"
+  },
+  "stable_worldmodel/wm/genie/genie.py": {
+    "mode": "100644",
+    "blob": "f19a4faff2fc48d8d5fefa02842be7d367c80ee6"
+  },
+  "stable_worldmodel/wm/genie/module.py": {
+    "mode": "100644",
+    "blob": "bbe57a089c373d07fab0dd732d0a7d801f92364a"
+  },
+  "stable_worldmodel/wm/lewm/__init__.py": {
+    "mode": "100644",
+    "blob": "4e1c5174859c760f2553635e1d631a9cc7ae5591"
+  },
+  "stable_worldmodel/wm/lewm/lewm.py": {
+    "mode": "100644",
+    "blob": "781854514c1f54460bb4910163a8953026b84de7"
+  },
+  "stable_worldmodel/wm/lewm/module.py": {
+    "mode": "100644",
+    "blob": "4f74d3b0664bf2f15e3003a3c550d3f7d71c316b"
+  },
+  "stable_worldmodel/wm/loss.py": {
+    "mode": "100644",
+    "blob": "21363a514dbbbea5448dad239cdbc45988fbe44f"
+  },
+  "stable_worldmodel/wm/pldm/__init__.py": {
+    "mode": "100644",
+    "blob": "3e6b2c035e33c48065196a8143ac44c192bbf041"
+  },
+  "stable_worldmodel/wm/pldm/module.py": {
+    "mode": "100644",
+    "blob": "4f74d3b0664bf2f15e3003a3c550d3f7d71c316b"
+  },
+  "stable_worldmodel/wm/pldm/pldm.py": {
+    "mode": "100644",
+    "blob": "38564fa3cbe5ced226266fd56216f6edb867b4e4"
+  },
+  "stable_worldmodel/wm/prejepa/__init__.py": {
+    "mode": "100644",
+    "blob": "424b80ff1d6fd541c250a97961302229e2327b0a"
+  },
+  "stable_worldmodel/wm/prejepa/module.py": {
+    "mode": "100644",
+    "blob": "e1f260ce3b11c47e45fb95bbe8e67da3364bfa9e"
+  },
+  "stable_worldmodel/wm/prejepa/prejepa.py": {
+    "mode": "100644",
+    "blob": "1387f641664f2dd63a906831aba695749a04a0bf"
+  },
+  "stable_worldmodel/wm/probes.py": {
+    "mode": "100644",
+    "blob": "c0bed153ca2d0017df231a1d1d965bf644ab9cc1"
+  },
+  "stable_worldmodel/wm/tdmpc2/__init__.py": {
+    "mode": "100644",
+    "blob": "232c11aa5ec9e5bb4de4f3c93ac4f26acee8204a"
+  },
+  "stable_worldmodel/wm/tdmpc2/module.py": {
+    "mode": "100644",
+    "blob": "8e405a4224bc05349a5a951784ab44bb49f8f674"
+  },
+  "stable_worldmodel/wm/tdmpc2/tdmpc2.py": {
+    "mode": "100644",
+    "blob": "ed87121b4bd195bba898887c7d8efaacf356dfab"
+  },
+  "stable_worldmodel/wm/utils.py": {
+    "mode": "100644",
+    "blob": "5178c00e402abcaa6cbb042aca2a8357c75257a0"
+  },
+  "stable_worldmodel/world/__init__.py": {
+    "mode": "100644",
+    "blob": "a4b55d875f2f69f1612cbab264498fd328e3c31c"
+  },
+  "stable_worldmodel/world/env_pool.py": {
+    "mode": "100644",
+    "blob": "545348b334af4d522dc685923c7f65b670f50f24"
+  },
+  "stable_worldmodel/world/world.py": {
+    "mode": "100644",
+    "blob": "cb360d3e8498cb318fa0e211e5ca3bfebf1ea3fe"
+  },
+  "stable_worldmodel/wrapper/__init__.py": {
+    "mode": "100644",
+    "blob": "2c32d9e25715e6df6ab5015c223b25cb2dbaf751"
+  },
+  "stable_worldmodel/wrapper/default.py": {
+    "mode": "100644",
+    "blob": "7b1606376dbd61bfe637ea225c3b2595524e768a"
+  },
+  "stable_worldmodel/wrapper/visual.py": {
+    "mode": "100644",
+    "blob": "f73192cb6030c35fb0072493192c4da2f571a465"
+  },
+  "tests/check_world.py": {
+    "mode": "100644",
+    "blob": "6da3378d5e70a9c3ca3ae4715cdb21817ebb2548"
+  },
+  "tests/data/_guards.py": {
+    "mode": "100644",
+    "blob": "97cf1eef64315e5a22728ba6f86bb7df4fb4dacd"
+  },
+  "tests/data/test_cli_datasets.py": {
+    "mode": "100644",
+    "blob": "d004f0f48e79d25a51272d66149c5a8fc93eb230"
+  },
+  "tests/data/test_cli_preview.py": {
+    "mode": "100644",
+    "blob": "3a53ab33c12a97a94cc18e0bdf053b379e566444"
+  },
+  "tests/data/test_convert_video_formats.py": {
+    "mode": "100644",
+    "blob": "73b252963c6aaaab1eda6c52970943747db9bc9b"
+  },
+  "tests/data/test_data.py": {
+    "mode": "100644",
+    "blob": "0221ba387d411ffd654bb0ce54302181d2926eb6"
+  },
+  "tests/data/test_data_utils.py": {
+    "mode": "100644",
+    "blob": "4c9e1cfcd8c64942816c0f3f0ded4b37ad3db1be"
+  },
+  "tests/data/test_datasets.py": {
+    "mode": "100644",
+    "blob": "b13a30bc3dcc19428ba949a1cd7c22b065d67bb8"
+  },
+  "tests/data/test_episode_data.py": {
+    "mode": "100644",
+    "blob": "8a71b7072121409b3d5a989db3755bddad602410"
+  },
+  "tests/data/test_format.py": {
+    "mode": "100644",
+    "blob": "f8b491ff821516fde0e120d608d895ce6dd15e24"
+  },
+  "tests/data/test_integration_real.py": {
+    "mode": "100644",
+    "blob": "87915d3e757c1f8f2fb6c16de2c0df9b4aeab81a"
+  },
+  "tests/data/test_lance.py": {
+    "mode": "100644",
+    "blob": "f38fddc1b2e1fb11a092e3b314b296964db15328"
+  },
+  "tests/data/test_lance_video.py": {
+    "mode": "100644",
+    "blob": "d561192668f7172def6358973f8a3915b7942274"
+  },
+  "tests/data/test_lance_video_storage.py": {
+    "mode": "100644",
+    "blob": "3668e2877b43cfd4a59627b126f04b9294ca7279"
+  },
+  "tests/data/test_lance_wide_column_read_hang.py": {
+    "mode": "100644",
+    "blob": "5506b1bbc722b0665e1934226666c82ecccbaf51"
+  },
+  "tests/data/test_lerobot_adapter.py": {
+    "mode": "100644",
+    "blob": "72e8694b1c0b8e2bc821d8cd80316c2efa251a3c"
+  },
+  "tests/data/test_merge.py": {
+    "mode": "100644",
+    "blob": "7eb4198485db38324ad5047429225844a55f7700"
+  },
+  "tests/data/test_normalization.py": {
+    "mode": "100644",
+    "blob": "80bb8f95bec28440a95fc9b466ccb18af3de1972"
+  },
+  "tests/data/test_protocol.py": {
+    "mode": "100644",
+    "blob": "74370f724ad9064c63056a88e18cd215b5ce187d"
+  },
+  "tests/data/test_replay_buffer.py": {
+    "mode": "100644",
+    "blob": "74961e3b6e146fb47e1b3d5369e4c3f5f7e4ca2f"
+  },
+  "tests/data/test_stress.py": {
+    "mode": "100644",
+    "blob": "2aa8393720c1f2b6576a44a7afc6e7474c7ba973"
+  },
+  "tests/envs/__init__.py": {
+    "mode": "100644",
+    "blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+  },
+  "tests/envs/test_fetch.py": {
+    "mode": "100644",
+    "blob": "07a36bf310d6034fc6ffb5d602dc71dd75106ecd"
+  },
+  "tests/envs/test_pusht_env.py": {
+    "mode": "100644",
+    "blob": "0ff5b18ce0ae3461d598813002507340784ebd8f"
+  },
+  "tests/envs/test_pusht_policy.py": {
+    "mode": "100644",
+    "blob": "acebf8ed98cf262d74da8b31d1c258380094b264"
+  },
+  "tests/planning/__init__.py": {
+    "mode": "100644",
+    "blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+  },
+  "tests/planning/solver/test_callbacks.py": {
+    "mode": "100644",
+    "blob": "49820f27a949c35130b06803d16cd11b6abe9937"
+  },
+  "tests/planning/solver/test_categorical_cem.py": {
+    "mode": "100644",
+    "blob": "5f46bad78294bff738b8e2e77039425665bb4404"
+  },
+  "tests/planning/solver/test_continuous.py": {
+    "mode": "100644",
+    "blob": "e21f7606066cae767490cc8c9c5e10d8cb8cc0fd"
+  },
+  "tests/planning/solver/test_lagrangian.py": {
+    "mode": "100644",
+    "blob": "43ec9e122b705a0df8c6ca3f9832c835c46d0061"
+  },
+  "tests/planning/solver/test_pgd.py": {
+    "mode": "100644",
+    "blob": "126b969c5e132311da9459755af74347277264f4"
+  },
+  "tests/planning/solver/test_warm_start_device_mismatch.py": {
+    "mode": "100644",
+    "blob": "808a73ba09e1b4de362f5584bdc4bf1c90d83756"
+  },
+  "tests/planning/test_evaluator.py": {
+    "mode": "100644",
+    "blob": "6bc3a35d4c64d9f5ac5b7e2641914155d86547eb"
+  },
+  "tests/planning/test_objective.py": {
+    "mode": "100644",
+    "blob": "fcd2b64ec9bb3b671b8629d1b07df2eb36df535a"
+  },
+  "tests/test_buffer.py": {
+    "mode": "100644",
+    "blob": "f1060882c98fcf3cd1dafcb7cca38c22e6453f49"
+  },
+  "tests/test_env_pool.py": {
+    "mode": "100644",
+    "blob": "7c6859d18fbc7fe5a918b4e32599074924184920"
+  },
+  "tests/test_new_world.py": {
+    "mode": "100644",
+    "blob": "a462fae51c58d65886fb775943b23528a48ce1be"
+  },
+  "tests/test_policy.py": {
+    "mode": "100644",
+    "blob": "65c6ddb36ef5d23f4732096e497fee60bf59ff81"
+  },
+  "tests/test_protocols.py": {
+    "mode": "100644",
+    "blob": "109377d51174aa88b8f0c6562486924269af599b"
+  },
+  "tests/test_spaces.py": {
+    "mode": "100644",
+    "blob": "b8a3bfeece19f037749f2ea7e3f7ce0643ab2ad9"
+  },
+  "tests/test_utils.py": {
+    "mode": "100644",
+    "blob": "5f9f0b880658a9c59df4ef28c54b2ccf0fa5f77a"
+  },
+  "tests/test_world.py": {
+    "mode": "100644",
+    "blob": "f891df14af26c9378582d1ef9bf4b2f01ceceb49"
+  },
+  "tests/test_wrappers.py": {
+    "mode": "100644",
+    "blob": "8f12b18d80d1e37d73553669829389a4fb9e43f9"
+  },
+  "tests/wm/__init__.py": {
+    "mode": "100644",
+    "blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+  },
+  "tests/wm/test_lewm.py": {
+    "mode": "100644",
+    "blob": "7fbc1e279761363ffb8f65304dd99fd46472791e"
+  },
+  "tests/wm/test_pldm.py": {
+    "mode": "100644",
+    "blob": "227afeb42165714bd06ae2d56081ddfeb6c7d070"
+  },
+  "tests/wm/test_prejepa.py": {
+    "mode": "100644",
+    "blob": "51ebbeaa7b6b296acd81dc8d1e8cecb9b6ad77f8"
+  },
+  "tests/wm/test_probes.py": {
+    "mode": "100644",
+    "blob": "2e6bbd4b142610259878729cc0b8f97109aba6e9"
+  },
+  "tests/wm/test_tdmpc2.py": {
+    "mode": "100644",
+    "blob": "b88d3b47adb6fa4e549d292d94f89c3f325b9302"
+  },
+  "tests/wm/test_utils.py": {
+    "mode": "100644",
+    "blob": "d5843b228701cd5d8a58171c4a10b9fdccda5345"
+  }
+}

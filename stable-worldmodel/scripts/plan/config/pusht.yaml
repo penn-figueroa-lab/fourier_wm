@@ -3,15 +3,6 @@ defaults:
   - solver: cem
   - objective: goal_mse
   - _self_
-  - override hydra/job_logging: disabled
-  - override hydra/hydra_logging: disabled
-
-hydra:
-  run:
-    dir: .
-  output_subdir: null
-  job:
-    chdir: false
 
 world:
   env_name: swm/PushT-v1
@@ -59,6 +50,4 @@ compile: false
 bf16: false
 
 output:
-  save_results: false
-  save_video: false
   filename: pusht_results.txt
