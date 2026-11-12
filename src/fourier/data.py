@@ -215,8 +215,8 @@ class DenseCommandDataset:
     """Storage-reader proxy with SWM's original clip indexing and transforms."""
 
     def __init__(self, name, action_spec, **kwargs):
-        import stable_worldmodel as swm
         from stable_worldmodel.data.dataset import Dataset
+        from .loading import load_dataset
 
         self.adapter = ActionAdapter(action_spec)
         self.transform = kwargs.pop("transform", None)
@@ -231,7 +231,7 @@ class DenseCommandDataset:
         keys = kwargs.get("keys_to_load")
         if keys is not None and self.adapter.state_dependent:
             kwargs["keys_to_load"] = list(dict.fromkeys([*keys, self.adapter.spec.position_key]))
-        self.raw = swm.data.load_dataset(name, frameskip=1, num_steps=1, **kwargs)
+        self.raw = load_dataset(name, frameskip=1, num_steps=1, **kwargs)
         self.lengths, self.offsets = self.raw.lengths, self.raw.offsets
         index = Dataset(self.lengths, self.offsets, self.frameskip, self.num_steps)
         self.clip_indices = index.clip_indices
@@ -244,22 +244,31 @@ class DenseCommandDataset:
         return len(self.clip_indices)
 
     def __getitem__(self, idx):
+        import torch
+        from .loading import SelectedFrameDataset
+
         ep, start = self.clip_indices[idx]
         begin = max(0, start - self.history_frames + 1)
-        values = self.raw._load_slice(ep, begin, start + self.span)
-        q = values.get(self.adapter.spec.position_key)
-        values["action"] = self.adapter.to_model(values["action"], q)
-        import torch
-
+        endpoints = torch.arange(self.num_steps) * self.frameskip
+        offsets = endpoints
         if self.history_frames > 1:
             # Encode only frames needed by teacher-forced source histories and
             # sparse targets. Clip indexing and endpoint offsets stay upstream's.
-            endpoints = torch.arange(self.num_steps) * self.frameskip
             sources = endpoints[:-1, None] - torch.arange(self.history_frames)
             offsets = torch.unique(torch.cat((sources.flatten(), endpoints)), sorted=True)
-            pixels = values["pixels"][(start + offsets).clamp_min(0) - begin]
             history_indices = torch.searchsorted(offsets, sources)
             endpoint_indices = torch.searchsorted(offsets, endpoints)
+        pixel_indices = (start + offsets).clamp_min(0)
+        if isinstance(self.raw, SelectedFrameDataset):
+            values = self.raw._load_slice(
+                ep, begin, start + self.span, pixel_indices=pixel_indices.tolist()
+            )
+            pixels = values.pop("pixels")
+        else:
+            values = self.raw._load_slice(ep, begin, start + self.span)
+            pixels = values.pop("pixels")[pixel_indices - begin]
+        q = values.get(self.adapter.spec.position_key)
+        values["action"] = self.adapter.to_model(values["action"], q)
         values = {k: v if isinstance(v, str) else v[start - begin :] for k, v in values.items()}
         if not torch.isfinite(values["action"][: self.span - self.frameskip]).all():
             raise ValueError("Nonfinite supervised primitive commands")
@@ -267,10 +276,9 @@ class DenseCommandDataset:
             k: v if k == "action" or isinstance(v, str) else v[:: self.frameskip]
             for k, v in values.items()
         }
+        values["pixels"] = pixels
         if self.history_frames > 1:
-            values.update(
-                pixels=pixels, history_indices=history_indices, endpoint_indices=endpoint_indices
-            )
+            values.update(history_indices=history_indices, endpoint_indices=endpoint_indices)
         if self.transform:
             values = self.transform(values)
         values["action"] = values["action"].reshape(self.num_steps, -1)

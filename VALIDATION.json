@@ -2,7 +2,7 @@
   "schema_version": 1,
   "date": "2026-11-11",
   "release_ready": false,
-  "source_code_sha256": "f1441db7d87a0a25b0e8a0fca2a4947c5f9acc6dd0f011ad59553e5e9949489f",
+  "source_code_sha256": "21dd1a33c7d143a3fa69122bc4d173e2369176322f63c31164bc8b6c1c4fb6a8",
   "upstream": {
     "ok": true,
     "expected_tree": "b4ea0f6e08ddd22c2fc74344de2f5577b9f563ed",
@@ -12,14 +12,14 @@
   },
   "validation": {
     "package": "fourier-wm-validation",
-    "version": "0.9.2",
-    "revision": "1f5a43c0b8ae4398c8add3a46ea2c1e23adde2f3",
-    "wheel": "fourier_wm_validation-0.9.2-py3-none-any.whl",
-    "wheel_sha256": "cd9d86c4a4b46fb7458247663dfd4a6a56f727dbe18c8072927f991558f2d224",
+    "version": "0.9.3",
+    "revision": "2da2fb452677e4458dc9dec1f68df4fcd2d83367",
+    "wheel": "fourier_wm_validation-0.9.3-py3-none-any.whl",
+    "wheel_sha256": "f5531fcf76ce41cace0ed4bf9e9ed20bcb69c9f8ac2fe234b8d3f081805b6ed1",
     "final_suite": {
-      "passed": 147,
+      "passed": 164,
       "failed": 0,
-      "seconds": 103.42
+      "seconds": 140.4
     }
   },
   "configuration": {
@@ -81,5 +81,36 @@
     "The cleaned checkout is newer than the frozen PARCC training snapshots. Exact resume requires the original source/dependency identity and full resume checkpoint.",
     "Deterministic rollout probes and short pipeline tests do not reproduce a complete benchmark or prove convergence. Longer PointMaze pilot results are recorded outside Git.",
     "Full acceptance across all experimental adapters and cluster GPU configurations remains incomplete. Native-force history dynamics support CEM; single-state SQP/TV-LQR cannot substitute."
-  ]
+  ],
+  "training_reader": {
+    "implementation": "project-owned selected-frame HDF5 proxy; native reader resolution and indexing reused",
+    "model_families": [
+      "fourier",
+      "lewm",
+      "dinowm"
+    ],
+    "images_and_dense_native_commands_bitwise_equal": true,
+    "dense_current_proprioception_preserved": true,
+    "adjacent_history_padding_equal": true,
+    "spawn_workers_checked": [
+      0,
+      2
+    ],
+    "short_training_weights_bitwise_equal_for_all_three_families": true,
+    "exact_interrupted_training_recovery": true,
+    "non_hdf5_reader_unchanged": true,
+    "local_throughput_pilot": {
+      "model": "fourier",
+      "environment": "pointmaze",
+      "batch_size": 128,
+      "workers": 2,
+      "precision": "bf16-mixed",
+      "timed_steps": 9,
+      "original_step_ms": 590.9569466667664,
+      "selected_step_ms": 349.07534644783783,
+      "speedup": 1.6929208913785974,
+      "final_loss_equal": true,
+      "scope": "One-episode official-release smoke export, warm local cache, RTX3090Ti, optimizer lr=0, no Lightning/checkpoint overhead; concurrent local work possible. Not a PARCC or full-campaign speed claim."
+    }
+  }
 }

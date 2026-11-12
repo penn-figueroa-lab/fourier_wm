@@ -16,6 +16,8 @@ export FOURIER_RUNS=/absolute/path/to/runs
 
 Python 3.11/CUDA 12.8 dependencies are locked. On a cluster, run installation, preparation and computation in allocated jobs. Site settings and scheduler adapters stay outside this repository.
 
+All three model families use a project HDF5 reader that loads only the required image frames. Primitive actions and conversion proprioception stay dense; clip selection, preprocessing and losses stay upstream's. No dataset conversion or extra loader setting is needed.
+
 ## Download → train → evaluate
 
 This example uses the released Two-Room data. `TASK` can also be `pusht`, `cube` or `pointmaze`:

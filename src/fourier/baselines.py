@@ -22,6 +22,7 @@ from .checkpoints import (
     metric_logger,
 )
 from .runtime import RunDirectory, atomic_json, upstream_module
+from .loading import load_dataset
 
 
 def preserve_extra_batch_axis(module, arguments):
@@ -44,7 +45,7 @@ def train_dinowm(cfg):
         directory, OmegaConf.to_container(cfg, resolve=False), resume=bool(cfg.resume_from)
     ):
         keys = list(cfg.wm.encoding)
-        dataset = swm.data.load_dataset(
+        dataset = load_dataset(
             cfg.dataset_name,
             num_steps=cfg.n_steps,
             frameskip=cfg.frameskip,
@@ -58,7 +59,7 @@ def train_dinowm(cfg):
         rng = torch.Generator().manual_seed(cfg.seed)
         if cfg.validation_dataset:
             train = dataset
-            val = swm.data.load_dataset(
+            val = load_dataset(
                 cfg.validation_dataset,
                 num_steps=cfg.n_steps,
                 frameskip=cfg.frameskip,

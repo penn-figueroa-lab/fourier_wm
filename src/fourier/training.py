@@ -137,6 +137,7 @@ def run(cfg):
         metric_logger,
     )
     from torchdata.stateful_dataloader import StatefulDataLoader
+    from .loading import load_dataset
 
     upstream = upstream_module("train.lewm")
     get_img_preprocessor = upstream.get_img_preprocessor
@@ -162,7 +163,7 @@ def run(cfg):
 
         dataset = command_dataset(name, OmegaConf.to_container(action_spec), **dataset_args)
     else:
-        dataset = swm.data.load_dataset(name, **dataset_args)
+        dataset = load_dataset(name, **dataset_args)
     m = dataset.get_dim("action")
     action_norm = column_normalizer(dataset, "action", "action")
     # SWM's normalizer fits finite raw train actions. Store the same population stats
@@ -188,7 +189,7 @@ def run(cfg):
         val_dataset = (
             command_dataset(cfg.validation_dataset, OmegaConf.to_container(action_spec), **val_args)
             if action_spec
-            else swm.data.load_dataset(cfg.validation_dataset, **val_args)
+            else load_dataset(cfg.validation_dataset, **val_args)
         )
         val_dataset.transform = transform
         train_dataset = dataset
