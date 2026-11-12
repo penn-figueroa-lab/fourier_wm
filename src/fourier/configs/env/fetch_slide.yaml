@@ -1,0 +1,29 @@
+# fetch_slide: project; 10 epochs; source training context 3.
+# Default evaluation: dataset_goal, goal offset 25, budget 50, horizon 25, replan 25.
+# CEM: 300 candidates, 30 elites, 30 iterations. Fourier rate-input state uses one image.
+environment:
+  name: fetch_slide
+  id: swm/FetchSlide-v3
+  family: fetch
+  kwargs:
+    flatten: false
+  image_size: 224
+  observation_keys: [pixels]
+  rendering:
+    hide_goal_marker: true
+  action:
+    kinds: [delta, delta, delta, delta]
+    scale: [0.05, 0.05, 0.05, 1.0]
+    dt: 0.04
+    units: [m/s, m/s, m/s, gripper_command/s]
+    low: [-1, -1, -1, -1]
+    high: [1, 1, 1, 1]
+  # Used only with --collect; --download uses the pinned release below when available.
+  collection:
+    policy: random
+    episodes: 1000
+    max_episode_steps: 200
+    seed: 3072
+  # Legacy environment tag; the selected paper/project protocol is resolved separately.
+  benchmark: project_extension
+  dataset: custom

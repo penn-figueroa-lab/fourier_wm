@@ -24,3 +24,9 @@ __pycache__/
 *.npy
 *.mp4
 *.lance/
+*.zip
+*.zst
+*.partial
+*.extracting
+*.download.lock
+*.extract.lock

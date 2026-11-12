@@ -1,0 +1,37 @@
+# tworoom: lewm_paper; 10 epochs; source training context 1.
+# Default evaluation: lewm_paper, goal offset 25, budget 50, horizon 25, replan 25.
+# CEM: 300 candidates, 30 elites, 10 iterations. Fourier rate-input state uses one image.
+environment:
+  name: tworoom
+  id: swm/TwoRoom-v1
+  family: tworoom
+  kwargs: {}
+  image_size: 224
+  action:
+    kinds: [delta, delta]
+    scale: [5.0, 5.0]
+    dt: 0.1
+    units: [pixel/s, pixel/s]
+    low: [-1, -1]
+    high: [1, 1]
+  # Used only with --collect; --download uses the pinned release below when available.
+  collection:
+    policy: random
+    episodes: 1000
+    max_episode_steps: 200
+    seed: 3072
+  # Legacy environment tag; the selected paper/project protocol is resolved separately.
+  benchmark: project_extension
+  dataset: lewm_tworooms
+dataset:
+  collection_policy: Noisy heuristic through the door then toward the target
+  environment: tworoom
+  source: https://huggingface.co/datasets/quentinll/lewm-tworooms
+  revision: 6903a2de048b13819d812da0b4dd661290bc01e4
+  artifact: tworoom.tar.zst
+  unpacked: tworoom.h5
+  archive_sha256: 494b1a02f0765cd9a0d9daf1786c419ced1009977fc45d01e3158932f8d080ca
+  approved_unpacked_sha256: []
+  released_episodes: 10000
+  paper_episodes: 10000
+  paper_epochs: 10

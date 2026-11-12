@@ -1,0 +1,47 @@
+# dinowm_pointmaze: source; 100 epochs; source training context 3.
+# Default evaluation: d4rl_image_history, goal offset 25, budget 250, horizon 25, replan 25.
+# Experimental native-force history path; requires the isolated legacy runtime. Not an active campaign.
+environment:
+  name: dinowm_pointmaze
+  id: fourier/DinoPointMaze-v1
+  family: d4rl_maze
+  kwargs: {}
+  image_size: 224
+  observation_keys: [pixels]
+  rendering:
+    engine: mujoco2.1.0
+    goal_marker: hidden
+    camera_azimuth: 90
+    camera_elevation: -90
+  action:
+    kinds: [force, force]
+    scale: [1.0, 1.0]
+    dt: 0.05
+    units: [native_motor_command, native_motor_command]
+    low: [-1.0, -1.0]
+    high: [1.0, 1.0]
+  # Used only with --collect; --download uses the pinned release below when available.
+  collection:
+    policy: official_release
+    episodes: 2000
+    max_episode_steps: 100
+    seed: null
+  benchmark: dinowm_release_images_only
+  dataset: dinowm_maze
+dataset:
+  environment: dinowm_pointmaze
+  source: https://huggingface.co/datasets/gaoyuezhou/dino_wm
+  revision: d5c69e8fe60c3ed6b01d2f6e88fbfd66be078e57
+  artifact: datasets/point_maze.zip
+  archive_sha256: 6c48ccf22c90b9af8dcf0e2cd70849aec8dd8e214ac5f1f09552bf8bc9494acc
+  collection_policy: original DINO-WM fully random force trajectories
+  released_episodes: 2000
+  released_episode_length: 100
+  split_episodes:
+    train: 1800
+    validation: 200
+  approved_unpacked_by_split:
+    train: [f79b71809cb04e84d7b4fd8450cf6cc1a4bc276ef5079c582c062d2edeaf19e6]
+    validation: [0922aba84715af71dac30fdbbb5acabb152d279c5b8e8e3c68722757087845d2]
+  note: Original episode split via torch.randperm seed42, before clipping. Original images/actions/state/proprio
+    preserved. Native MuJoCo2.1 runtime required for evaluation.

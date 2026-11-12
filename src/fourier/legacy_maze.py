@@ -106,7 +106,7 @@ def make_env(budget, *, python=None):
     python = python or os.environ.get("FOURIER_LEGACY_PYTHON")
     if not python or not Path(python).is_file():
         raise RuntimeError(
-            "DINO-WM Maze needs the isolated MuJoCo2.1 runtime. Set FOURIER_LEGACY_PYTHON to its Python3.9 executable; see docs/GUIDE.md. Modern MuJoCo physics cannot substitute."
+            "DINO-WM Maze needs the isolated MuJoCo2.1 runtime. Set FOURIER_LEGACY_PYTHON to its Python3.9 executable; use scripts/install-legacy-maze.sh. Modern MuJoCo physics cannot substitute."
         )
 
     class ForceMaze(gym.Env):

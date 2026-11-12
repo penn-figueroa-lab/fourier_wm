@@ -1,0 +1,34 @@
+# Data: official pointmaze-large-navigate-v0 (1,000 train / 100 validation episodes).
+# The importer pins both NPZ hashes; training enforces dataset.regime=official_navigate.
+# pointmaze: project; 10 epochs; source training context 3.
+# Default evaluation: dataset_goal, goal offset 25, budget 50, horizon 25, replan 25.
+# CEM: 300 candidates, 30 elites, 30 iterations. Fourier rate-input state uses one image.
+environment:
+  name: pointmaze
+  id: swm/OGBMaze-v0
+  family: pointmaze
+  kwargs:
+    loco_env_type: point
+    maze_env_type: maze
+    maze_type: large
+    ob_type: pixels
+    width: 224
+    height: 224
+  image_size: 224
+  observation_keys: [pixels]
+  action:
+    kinds: [delta, delta]
+    scale: [0.2, 0.2]
+    dt: 0.1
+    units: [world_unit/s, world_unit/s]
+    low: [-1, -1]
+    high: [1, 1]
+  # Used only with --collect; --download uses the pinned release below when available.
+  collection:
+    policy: official_release
+    episodes: 1000
+    max_episode_steps: 1000
+    seed: null
+  # Legacy environment tag; the selected paper/project protocol is resolved separately.
+  benchmark: project_extension
+  dataset: custom  # Project benchmark namespace; this does not select a custom collection.

@@ -1,0 +1,32 @@
+# scene: project; 10 epochs; source training context 3.
+# Default evaluation: dataset_goal, goal offset 25, budget 50, horizon 25, replan 25.
+# CEM: 300 candidates, 30 elites, 30 iterations. Fourier rate-input state uses one image.
+environment:
+  name: scene
+  id: swm/OGBScene-v0
+  family: scene
+  kwargs:
+    env_type: single
+    ob_type: states
+    multiview: false
+    width: 224
+    height: 224
+    visualize_info: false
+    terminate_at_goal: true
+  image_size: 224
+  action:
+    kinds: [delta, delta, delta, delta, delta]
+    scale: [0.05, 0.05, 0.05, 0.3, 1.0]
+    dt: 0.05
+    units: [m/s, m/s, m/s, rad/s, opening_fraction/s]
+    low: [-1, -1, -1, -1, -1]
+    high: [1, 1, 1, 1, 1]
+  # Used only with --collect; --download uses the pinned release below when available.
+  collection:
+    policy: random
+    episodes: 1000
+    max_episode_steps: 200
+    seed: 3072
+  # Legacy environment tag; the selected paper/project protocol is resolved separately.
+  benchmark: project_extension
+  dataset: custom

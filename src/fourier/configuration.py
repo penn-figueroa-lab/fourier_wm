@@ -4,12 +4,12 @@ import os
 
 from omegaconf import OmegaConf, open_dict
 
-from .runtime import CONFIG_ROOT, swm_root
+from .runtime import CONFIG_ROOT, load_catalog, swm_root
 
 
 def benchmark_policy(environment):
     """Highest-priority published CONTROL benchmark, matched by exact setup."""
-    catalog = OmegaConf.load(CONFIG_ROOT / "benchmarks.yaml")
+    catalog = load_catalog()
     for authority in catalog.paper_priority:
         entry = catalog.published[authority]
         if environment in entry.environments:
@@ -41,7 +41,7 @@ def compose(name="experiment", overrides=()):
     if name != "experiment":
         with initialize_config_dir(version_base=None, config_dir=str(CONFIG_ROOT)):
             return hydra_compose(config_name=name, overrides=list(overrides))
-    catalog = OmegaConf.load(CONFIG_ROOT / "benchmarks.yaml")
+    catalog = load_catalog()
     selectors, options = {}, []
     for item in overrides:
         key, _, value = item.partition("=")
@@ -225,20 +225,7 @@ def training_config(experiment):
         observation_keys = environment.get("observation_keys")
         if observation_keys is not None:
             cfg.observation_keys = list(observation_keys)
-        if observation_keys is not None:
-            if (
-                observation_keys == ["pixels", "proprio"]
-                and environment["name"] == "dinowm_pointmaze"
-            ):
-                if family not in {"fourier", "lewm"}:
-                    raise ValueError(
-                        "DINO force-maze reference uses the original released DINO-WM implementation"
-                    )
-                cfg.model._target_ = "fourier.world_model.ProprioLeWM"
-                cfg.model.proprio_dim = 4
-                cfg.model.embed_dim = cfg.embed_dim
-                keys = ["pixels", "action", "proprio"]
-            elif observation_keys != ["pixels"]:
+            if observation_keys != ["pixels"]:
                 raise ValueError("This benchmark supports image-only model observations")
             elif family == "dinowm":
                 for override in overrides:

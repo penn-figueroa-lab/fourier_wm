@@ -21,6 +21,7 @@ preparation:
   expected_sha256: null
   split: train
   collect: false
+  download: false
   episodes: null
 environment: null
 protocol: null

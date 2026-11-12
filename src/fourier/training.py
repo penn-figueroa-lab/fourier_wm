@@ -7,7 +7,7 @@ from torch import nn
 class SIGReg(nn.Module):
     """LeWM's single-device sketch Gaussian regularizer on [T, B, D].
 
-    Adapted from LeWM module.py (Lucas Maes, MIT; see THIRD_PARTY_LICENSES).
+    Adapted from LeWM module.py (Lucas Maes, MIT); see stable-worldmodel/LICENSE.
     This is not a guarantee against all representation collapse.
     """
 

@@ -1,427 +1,4 @@
-environment:
-  dinowm_pointmaze:
-    name: dinowm_pointmaze
-    id: fourier/DinoPointMaze-v1
-    family: d4rl_maze
-    kwargs: {}
-    image_size: 224
-    observation_keys: [pixels]
-    rendering: {engine: mujoco2.1.0, goal_marker: hidden, camera_azimuth: 90, camera_elevation: -90}
-    action:
-      kinds: [force, force]
-      scale: [1.0, 1.0]
-      dt: 0.05
-      units: [native_motor_command, native_motor_command]
-      low: [-1.0, -1.0]
-      high: [1.0, 1.0]
-    collection: {policy: official_release, episodes: 2000, max_episode_steps: 100, seed: null}
-    benchmark: dinowm_release_images_only
-    dataset: dinowm_maze
-  cube:
-    name: cube
-    id: swm/OGBCube-v0
-    family: cube
-    kwargs:
-      env_type: single
-      ob_type: states
-      multiview: false
-      width: 224
-      height: 224
-      visualize_info: false
-      terminate_at_goal: true
-    image_size: 224
-    action:
-      kinds:
-      - delta
-      - delta
-      - delta
-      - delta
-      - delta
-      scale:
-      - 0.05
-      - 0.05
-      - 0.05
-      - 0.3
-      - 1.0
-      dt: 0.05
-      units:
-      - m/s
-      - m/s
-      - m/s
-      - rad/s
-      - opening_fraction/s
-      low:
-      - -1
-      - -1
-      - -1
-      - -1
-      - -1
-      high:
-      - 1
-      - 1
-      - 1
-      - 1
-      - 1
-    collection:
-      policy: random
-      episodes: 1000
-      max_episode_steps: 200
-      seed: 3072
-    benchmark: project_extension
-    dataset: lewm_cube
-  fetch_pickandplace:
-    name: fetch_pickandplace
-    id: swm/FetchPickAndPlace-v3
-    family: fetch
-    kwargs:
-      flatten: false
-    image_size: 224
-    observation_keys: [pixels]
-    rendering: {hide_goal_marker: true}
-    action:
-      kinds:
-      - delta
-      - delta
-      - delta
-      - delta
-      scale:
-      - 0.05
-      - 0.05
-      - 0.05
-      - 1.0
-      dt: 0.04
-      units:
-      - m/s
-      - m/s
-      - m/s
-      - gripper_command/s
-      low:
-      - -1
-      - -1
-      - -1
-      - -1
-      high:
-      - 1
-      - 1
-      - 1
-      - 1
-    collection:
-      policy: random
-      episodes: 1000
-      max_episode_steps: 200
-      seed: 3072
-    benchmark: project_extension
-    dataset: custom
-  fetch_push:
-    name: fetch_push
-    id: swm/FetchPush-v3
-    family: fetch
-    kwargs:
-      flatten: false
-    image_size: 224
-    observation_keys: [pixels]
-    rendering: {hide_goal_marker: true}
-    action:
-      kinds:
-      - delta
-      - delta
-      - delta
-      - delta
-      scale:
-      - 0.05
-      - 0.05
-      - 0.05
-      - 1.0
-      dt: 0.04
-      units:
-      - m/s
-      - m/s
-      - m/s
-      - gripper_command/s
-      low:
-      - -1
-      - -1
-      - -1
-      - -1
-      high:
-      - 1
-      - 1
-      - 1
-      - 1
-    collection:
-      policy: random
-      episodes: 1000
-      max_episode_steps: 200
-      seed: 3072
-    benchmark: project_extension
-    dataset: custom
-  fetch_reach:
-    name: fetch_reach
-    id: swm/FetchReach-v3
-    family: fetch
-    kwargs:
-      flatten: false
-    image_size: 224
-    observation_keys: [pixels]
-    rendering: {hide_goal_marker: true}
-    action:
-      kinds:
-      - delta
-      - delta
-      - delta
-      - delta
-      scale:
-      - 0.05
-      - 0.05
-      - 0.05
-      - 1.0
-      dt: 0.04
-      units:
-      - m/s
-      - m/s
-      - m/s
-      - gripper_command/s
-      low:
-      - -1
-      - -1
-      - -1
-      - -1
-      high:
-      - 1
-      - 1
-      - 1
-      - 1
-    collection:
-      policy: random
-      episodes: 1000
-      max_episode_steps: 200
-      seed: 3072
-    benchmark: project_extension
-    dataset: custom
-  fetch_slide:
-    name: fetch_slide
-    id: swm/FetchSlide-v3
-    family: fetch
-    kwargs:
-      flatten: false
-    image_size: 224
-    observation_keys: [pixels]
-    rendering: {hide_goal_marker: true}
-    action:
-      kinds:
-      - delta
-      - delta
-      - delta
-      - delta
-      scale:
-      - 0.05
-      - 0.05
-      - 0.05
-      - 1.0
-      dt: 0.04
-      units:
-      - m/s
-      - m/s
-      - m/s
-      - gripper_command/s
-      low:
-      - -1
-      - -1
-      - -1
-      - -1
-      high:
-      - 1
-      - 1
-      - 1
-      - 1
-    collection:
-      policy: random
-      episodes: 1000
-      max_episode_steps: 200
-      seed: 3072
-    benchmark: project_extension
-    dataset: custom
-  pointmaze:
-    name: pointmaze
-    id: swm/OGBMaze-v0
-    family: pointmaze
-    kwargs:
-      loco_env_type: point
-      maze_env_type: maze
-      maze_type: large
-      ob_type: pixels
-      width: 224
-      height: 224
-    image_size: 224
-    observation_keys: [pixels]
-    action:
-      kinds:
-      - delta
-      - delta
-      scale:
-      - 0.2
-      - 0.2
-      dt: 0.1
-      units:
-      - world_unit/s
-      - world_unit/s
-      low:
-      - -1
-      - -1
-      high:
-      - 1
-      - 1
-    collection:
-      policy: official_release
-      episodes: 1000
-      max_episode_steps: 1000
-      seed: null
-    benchmark: project_extension
-    dataset: custom
-  pusht:
-    name: pusht
-    id: swm/PushT-v1
-    family: pusht
-    kwargs:
-      relative: true
-    image_size: 224
-    action:
-      kinds:
-      - delta
-      - delta
-      scale:
-      - 100.0
-      - 100.0
-      dt: 0.1
-      units:
-      - pixel/s
-      - pixel/s
-      low:
-      - -1
-      - -1
-      high:
-      - 1
-      - 1
-    collection:
-      policy: random
-      episodes: 1000
-      max_episode_steps: 200
-      seed: 3072
-    benchmark: project_extension
-    dataset: lewm_pusht
-  scene:
-    name: scene
-    id: swm/OGBScene-v0
-    family: scene
-    kwargs:
-      env_type: single
-      ob_type: states
-      multiview: false
-      width: 224
-      height: 224
-      visualize_info: false
-      terminate_at_goal: true
-    image_size: 224
-    action:
-      kinds:
-      - delta
-      - delta
-      - delta
-      - delta
-      - delta
-      scale:
-      - 0.05
-      - 0.05
-      - 0.05
-      - 0.3
-      - 1.0
-      dt: 0.05
-      units:
-      - m/s
-      - m/s
-      - m/s
-      - rad/s
-      - opening_fraction/s
-      low:
-      - -1
-      - -1
-      - -1
-      - -1
-      - -1
-      high:
-      - 1
-      - 1
-      - 1
-      - 1
-      - 1
-    collection:
-      policy: random
-      episodes: 1000
-      max_episode_steps: 200
-      seed: 3072
-    benchmark: project_extension
-    dataset: custom
-  simple_pointmaze:
-    name: simple_pointmaze
-    id: swm/SimplePointMaze-v0
-    family: simple_pointmaze
-    kwargs:
-      show_goal: false
-    image_size: 224
-    action:
-      kinds:
-      - delta
-      - delta
-      scale:
-      - 1.0
-      - 1.0
-      dt: 1.0
-      units:
-      - world_unit/step
-      - world_unit/step
-      low:
-      - -0.2
-      - -0.2
-      high:
-      - 0.2
-      - 0.2
-    collection:
-      policy: random
-      episodes: 1000
-      max_episode_steps: 200
-      seed: 3072
-    benchmark: project_extension
-    dataset: custom
-  tworoom:
-    name: tworoom
-    id: swm/TwoRoom-v1
-    family: tworoom
-    kwargs: {}
-    image_size: 224
-    action:
-      kinds:
-      - delta
-      - delta
-      scale:
-      - 5.0
-      - 5.0
-      dt: 0.1
-      units:
-      - pixel/s
-      - pixel/s
-      low:
-      - -1
-      - -1
-      high:
-      - 1
-      - 1
-    collection:
-      policy: random
-      episodes: 1000
-      max_episode_steps: 200
-      seed: 3072
-    benchmark: project_extension
-    dataset: lewm_tworooms
+# Shared protocols, planners and publication priority. Environment/data details are in env/*.yaml.
 protocol:
   dinowm_paper:
     name: d4rl_image_history
@@ -437,7 +14,8 @@ protocol:
     feedback: false
     feedback_q: 1.0
     feedback_r: 1.0
-    budget_status: image-only project adaptation with three-frame context and a 250-step cap; DINO-WM's proprioceptive 98% result is not a matched baseline
+    budget_status: image-only project adaptation with three-frame context and a 250-step cap; DINO-WM's
+      proprioceptive 98% result is not a matched baseline
   swm_table1:
     name: swm_table1
     allowed_environments: [pusht, cube]
@@ -474,8 +52,7 @@ protocol:
     feedback_r: 1.0
   swm_paper:
     name: swm_paper
-    allowed_environments:
-    - pusht
+    allowed_environments: [pusht]
     num_eval: 50
     goal_offset: 25
     budget: 50
@@ -486,10 +63,7 @@ protocol:
     feedback_r: 1.0
   lewm_paper:
     name: lewm_paper
-    allowed_environments:
-    - pusht
-    - cube
-    - tworoom
+    allowed_environments: [pusht, cube, tworoom]
     num_eval: 50
     goal_offset: 25
     budget: 50
@@ -516,66 +90,7 @@ planner:
     damping: 0.01
     bound: 3.0
     max_step: 1.0
-datasets:
-  dinowm_maze:
-    environment: dinowm_pointmaze
-    source: https://huggingface.co/datasets/gaoyuezhou/dino_wm
-    revision: d5c69e8fe60c3ed6b01d2f6e88fbfd66be078e57
-    artifact: datasets/point_maze.zip
-    archive_sha256: 6c48ccf22c90b9af8dcf0e2cd70849aec8dd8e214ac5f1f09552bf8bc9494acc
-    collection_policy: original DINO-WM fully random force trajectories
-    released_episodes: 2000
-    released_episode_length: 100
-    split_episodes: {train: 1800, validation: 200}
-    approved_unpacked_by_split:
-      train: [f79b71809cb04e84d7b4fd8450cf6cc1a4bc276ef5079c582c062d2edeaf19e6]
-      validation: [0922aba84715af71dac30fdbbb5acabb152d279c5b8e8e3c68722757087845d2]
-    note: Original episode split via torch.randperm seed42, before clipping. Original images/actions/state/proprio preserved. Native MuJoCo2.1 runtime required for evaluation.
-  lewm_pusht:
-    collection_policy: DINO-WM expert demonstrations (author release)
-    environment: pusht
-    source: https://huggingface.co/datasets/quentinll/lewm-pusht
-    revision: 655cd446b9929369d7d406001da85c15d1457850
-    artifact: pusht_expert_train.h5.zst
-    archive_sha256: 7cfbd6d90fa2f27876379a5ff169715a36ed82edbda64f9e5b5bfa34d212f318
-    approved_unpacked_sha256:
-    - b6ebd9ac94bbe9e383f6e7a9cd92d74e9aa665ea57b758ed3717b0ee7df8d4fb
-    released_episodes: 18685
-    released_frames: 2336736
-    paper_episodes: 20000
-    paper_epochs: 10
-    note: Paper describes 20k episodes; pin the actual released HDF5 (18,685 episodes),
-      not an assumed episode count.
-  lewm_cube:
-    collection_policy: OGBench single-cube collection heuristic
-    environment: cube
-    source: https://huggingface.co/datasets/quentinll/lewm-cube
-    revision: 02a19a67a0dc8c9d6215f89c19e0a597691e152a
-    artifact: cube_single_expert.tar.zst
-    archive_sha256: 3725d6a01abd492164441ef0a27e588f52b94a118fab56b96987b1a34a6c2600
-    approved_unpacked_sha256: []
-    released_episodes: 10000
-    released_frames: 2010000
-    released_episode_length: 201
-    paper_episodes: 10000
-    paper_episode_length: 200
-    paper_epochs: 10
-    note: LeWM-collected single-cube expert release. Each episode stores 200
-      transitions plus its terminal observation (201 rows; final action is NaN).
-      The official OGBench play NPZ is a different dataset.
-  lewm_tworooms:
-    collection_policy: Noisy heuristic through the door then toward the target
-    environment: tworoom
-    source: https://huggingface.co/datasets/quentinll/lewm-tworooms
-    revision: 6903a2de048b13819d812da0b4dd661290bc01e4
-    artifact: tworoom.tar.zst
-    archive_sha256: 494b1a02f0765cd9a0d9daf1786c419ced1009977fc45d01e3158932f8d080ca
-    approved_unpacked_sha256: []
-    released_episodes: 10000
-    paper_episodes: 10000
-    paper_epochs: 10
 paper_priority: [swm, lewm, dinowm]
-# Coverage means published control results, not merely a registered environment.
 published:
   swm:
     environments: [pusht, cube]
@@ -583,10 +98,13 @@ published:
     train_models: [fourier]
     history: 3
     epochs: 10
-    training_evidence: Appendix I delegates to original publications; Fourier uses the LeWM 10-epoch encoder/dynamics budget.
-    evaluation_evidence: Push-T Appendix I; Cube uses pinned released cube.yaml and solver/cem.yaml because Appendix I only details Push-T.
+    training_evidence: Appendix I delegates to original publications; Fourier uses the LeWM 10-epoch encoder/dynamics
+      budget.
+    evaluation_evidence: Push-T Appendix I; Cube uses pinned released cube.yaml and solver/cem.yaml because
+      Appendix I only details Push-T.
     unresolved:
-      dinowm: SWM source defaults to 10 epochs but Appendix I delegates to DINO-WM whose paper and source specify 100. Reuse the published result; baseline retraining needs an explicit resolved protocol.
+      dinowm: SWM source defaults to 10 epochs but Appendix I delegates to DINO-WM whose paper and source
+        specify 100. Reuse the published result; baseline retraining needs an explicit resolved protocol.
   lewm:
     environments: [pusht, cube, tworoom, reacher]
     protocol: lewm_paper
@@ -596,26 +114,40 @@ published:
     environment_overrides:
       tworoom:
         history: 1
-    training_evidence: Appendices D/E; 10 epochs, history one for TwoRoom and three for Push-T/Cube; DINO-WM excludes proprioception unless specified.
+    training_evidence: Appendices D/E; 10 epochs, history one for TwoRoom and three for Push-T/Cube; DINO-WM
+      excludes proprioception unless specified.
     evaluation_evidence: Appendices D/F.1; offset 25, budget 50; CEM 30 iterations for Push-T and 10 otherwise.
     unresolved: {}
   dinowm:
-    environments: [pusht, reacher, dinowm_pointmaze, dinowm_wall, rope, granular, wall_random, pushobj, granular_random]
+    environments: [pusht, reacher, dinowm_pointmaze, dinowm_wall, rope, granular, wall_random, pushobj,
+      granular_random]
     protocol: dinowm_paper
     train_models: [fourier, lewm]
     epochs: 100
     history: 3
     frameskip: 5
     environment_overrides:
-      dinowm_wall: {history: 1}
-      wall_random: {history: 1}
-      rope: {history: 1, frameskip: 1}
-      granular: {history: 1, frameskip: 1}
-      granular_random: {history: 1, frameskip: 1}
-    training_evidence: Appendix A.9 and pinned conf/train.yaml; episode split and environment-specific frameskip/history must use the original dataset loader.
-    evaluation_evidence: Original plan configs; random-state goals and MPC, not the SWM dataset-offset task sampler.
+      dinowm_wall:
+        history: 1
+      wall_random:
+        history: 1
+      rope:
+        history: 1
+        frameskip: 1
+      granular:
+        history: 1
+        frameskip: 1
+      granular_random:
+        history: 1
+        frameskip: 1
+    training_evidence: Appendix A.9 and pinned conf/train.yaml; episode split and environment-specific
+      frameskip/history must use the original dataset loader.
+    evaluation_evidence: Original plan configs; random-state goals and MPC, not the SWM dataset-offset
+      task sampler.
     unresolved:
-      optimizer: Paper predictor LR 5e-5 conflicts with released conf/train.yaml 5e-4; paper text also conflicts on 196 versus 224 image size. Do not silently choose or label an unverified adaptation exact.
+      optimizer: Paper predictor LR 5e-5 conflicts with released conf/train.yaml 5e-4; paper text also
+        conflicts on 196 versus 224 image size. Do not silently choose or label an unverified adaptation
+        exact.
 papers:
   lewm: https://arxiv.org/html/2603.19312v3
   swm: https://arxiv.org/html/2605.21800v1

@@ -1,0 +1,49 @@
+# cube: swm_paper; 10 epochs; source training context 3.
+# Default evaluation: swm_table1, goal offset 25, budget 50, horizon 25, replan 25.
+# CEM: 300 candidates, 30 elites, 30 iterations. Fourier rate-input state uses one image.
+environment:
+  name: cube
+  id: swm/OGBCube-v0
+  family: cube
+  kwargs:
+    env_type: single
+    ob_type: states
+    multiview: false
+    width: 224
+    height: 224
+    visualize_info: false
+    terminate_at_goal: true
+  image_size: 224
+  action:
+    kinds: [delta, delta, delta, delta, delta]
+    scale: [0.05, 0.05, 0.05, 0.3, 1.0]
+    dt: 0.05
+    units: [m/s, m/s, m/s, rad/s, opening_fraction/s]
+    low: [-1, -1, -1, -1, -1]
+    high: [1, 1, 1, 1, 1]
+  # Used only with --collect; --download uses the pinned release below when available.
+  collection:
+    policy: random
+    episodes: 1000
+    max_episode_steps: 200
+    seed: 3072
+  # Legacy environment tag; the selected paper/project protocol is resolved separately.
+  benchmark: project_extension
+  dataset: lewm_cube
+dataset:
+  collection_policy: OGBench single-cube collection heuristic
+  environment: cube
+  source: https://huggingface.co/datasets/quentinll/lewm-cube
+  revision: 02a19a67a0dc8c9d6215f89c19e0a597691e152a
+  artifact: cube_single_expert.tar.zst
+  unpacked: cube_single_expert.h5
+  archive_sha256: 3725d6a01abd492164441ef0a27e588f52b94a118fab56b96987b1a34a6c2600
+  approved_unpacked_sha256: []
+  released_episodes: 10000
+  released_frames: 2010000
+  released_episode_length: 201
+  paper_episodes: 10000
+  paper_episode_length: 200
+  paper_epochs: 10
+  note: LeWM-collected single-cube expert release. Each episode stores 200 transitions plus its terminal
+    observation (201 rows; final action is NaN). The official OGBench play NPZ is a different dataset.

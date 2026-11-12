@@ -12,6 +12,23 @@ UPSTREAM_TREE = "b4ea0f6e08ddd22c2fc74344de2f5577b9f563ed"
 CONFIG_ROOT = Path(__file__).parent / "configs"
 
 
+def load_catalog():
+    """One packaged config tree: shared protocols plus one file per environment."""
+    from omegaconf import OmegaConf
+
+    catalog = OmegaConf.load(CONFIG_ROOT / "benchmarks.yaml")
+    catalog.environment, catalog.datasets = {}, {}
+    for path in sorted((CONFIG_ROOT / "env").glob("*.yaml")):
+        entry = OmegaConf.load(path)
+        name = entry.environment.name
+        if name != path.stem:
+            raise ValueError(f"Environment name and config filename differ: {path}")
+        catalog.environment[name] = entry.environment
+        if "dataset" in entry:
+            catalog.datasets[entry.environment.dataset] = entry.dataset
+    return catalog
+
+
 def swm_root():
     import stable_worldmodel
 

@@ -1,0 +1,41 @@
+# pusht: swm_paper; 10 epochs; source training context 3.
+# Default evaluation: swm_table1, goal offset 25, budget 50, horizon 25, replan 25.
+# CEM: 300 candidates, 30 elites, 30 iterations. Fourier rate-input state uses one image.
+environment:
+  name: pusht
+  id: swm/PushT-v1
+  family: pusht
+  kwargs:
+    relative: true
+  image_size: 224
+  action:
+    kinds: [delta, delta]
+    scale: [100.0, 100.0]
+    dt: 0.1
+    units: [pixel/s, pixel/s]
+    low: [-1, -1]
+    high: [1, 1]
+  # Used only with --collect; --download uses the pinned release below when available.
+  collection:
+    policy: random
+    episodes: 1000
+    max_episode_steps: 200
+    seed: 3072
+  # Legacy environment tag; the selected paper/project protocol is resolved separately.
+  benchmark: project_extension
+  dataset: lewm_pusht
+dataset:
+  collection_policy: DINO-WM expert demonstrations (author release)
+  environment: pusht
+  source: https://huggingface.co/datasets/quentinll/lewm-pusht
+  revision: 655cd446b9929369d7d406001da85c15d1457850
+  artifact: pusht_expert_train.h5.zst
+  unpacked: pusht_expert_train.h5
+  archive_sha256: 7cfbd6d90fa2f27876379a5ff169715a36ed82edbda64f9e5b5bfa34d212f318
+  approved_unpacked_sha256: [b6ebd9ac94bbe9e383f6e7a9cd92d74e9aa665ea57b758ed3717b0ee7df8d4fb]
+  released_episodes: 18685
+  released_frames: 2336736
+  paper_episodes: 20000
+  paper_epochs: 10
+  note: Paper describes 20k episodes; pin the actual released HDF5 (18,685 episodes), not an assumed episode
+    count.

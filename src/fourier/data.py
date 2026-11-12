@@ -6,13 +6,13 @@ from pathlib import Path
 import numpy as np
 
 from .actions import ActionAdapter
-from .runtime import atomic_json, fingerprint, tree_hash, CONFIG_ROOT, file_hash
+from .runtime import atomic_json, fingerprint, tree_hash, file_hash, load_catalog
 
 
 def dataset_catalog():
     from omegaconf import OmegaConf
 
-    return OmegaConf.to_container(OmegaConf.load(CONFIG_ROOT / "benchmarks.yaml").datasets)
+    return OmegaConf.to_container(load_catalog().datasets)
 
 
 def require_paper_dataset(manifest, environment):

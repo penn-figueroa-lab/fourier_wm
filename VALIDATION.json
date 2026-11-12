@@ -2,7 +2,7 @@
   "schema_version": 1,
   "date": "2026-11-11",
   "release_ready": false,
-  "source_code_sha256": "b4c579d01ef6251c6af880c65e56de80a97488b88b5e1c2900e406ebd8bb70ee",
+  "source_code_sha256": "f1441db7d87a0a25b0e8a0fca2a4947c5f9acc6dd0f011ad59553e5e9949489f",
   "upstream": {
     "ok": true,
     "expected_tree": "b4ea0f6e08ddd22c2fc74344de2f5577b9f563ed",
@@ -10,68 +10,76 @@
     "changed": [],
     "checked_files": 357
   },
-  "external_validation": {
+  "validation": {
     "package": "fourier-wm-validation",
-    "version": "0.9.1",
-    "revision": "d747214a488d6b493f3742f9de9ec93746d51c32",
-    "wheel": "fourier_wm_validation-0.9.1-py3-none-any.whl",
-    "wheel_sha256": "80d021cc7e3c049486e4f08ce5a5989d87913dd0366d7eed65dff9fba5243346",
-    "acceptance_checks": {
-      "passed": 132,
+    "version": "0.9.2",
+    "revision": "1f5a43c0b8ae4398c8add3a46ea2c1e23adde2f3",
+    "wheel": "fourier_wm_validation-0.9.2-py3-none-any.whl",
+    "wheel_sha256": "cd9d86c4a4b46fb7458247663dfd4a6a56f727dbe18c8072927f991558f2d224",
+    "final_suite": {
+      "passed": 147,
       "failed": 0,
-      "seconds": 97.13
-    },
-    "handoff_checks": {
-      "passed": 4,
-      "failed": 0,
-      "seconds": 3.87
+      "seconds": 103.42
     }
   },
-  "additional_checks": {
-    "formatting_preserves_ast": true,
-    "packaged_configs_and_licenses": true,
-    "locked_dependency_resolution": true,
-    "cwd_independent_checkpoint_doctor": true,
-    "documented_closed_loop_config_and_saved_tasks": true,
-    "live_frozen_source_comparison": {
-      "snapshots": 3,
-      "core_files_checked": 18,
-      "differences": 0
+  "configuration": {
+    "canonical_location": "src/fourier/configs",
+    "environment_files": 11,
+    "project_docs_consolidated_into_readme": true,
+    "root_config_alias_removed": true,
+    "resolved_configurations_compared": 66,
+    "resolved_configuration_differences": 0,
+    "scope": "Layout reorganization compared across 11 environments, three model families and default/closed-loop protocols; resolved settings unchanged."
+  },
+  "data_workflow": {
+    "http_resume_and_checksum_tests": true,
+    "bounded_retries_and_writer_locks": true,
+    "atomic_safe_hdf5_extraction": true,
+    "empty_folder_download_train_evaluate": true,
+    "live_pinned_huggingface_urls": {
+      "pusht": 200,
+      "cube": 200,
+      "tworoom": 200
     },
-    "dataset_free_tworoom_demo": {
-      "cem": {
-        "passed": true,
-        "steps": 2
-      },
-      "eight_start_gauss_newton_tvlqr": {
-        "passed": true,
-        "steps": 6
-      },
-      "outputs": "Side-by-side observation/goal GIF, actions and result records; not benchmark success rates"
+    "live_ogbench_validation_download_checksum_verified": true,
+    "official_ogbench_limited_export": {
+      "train_episodes": 1,
+      "validation_episodes": 1,
+      "source_states_and_actions_checked": true,
+      "limited_data_rejected_by_full_training": true
     }
   },
-  "tworoom": {
-    "checkpoint_seeds": [
+  "portability": {
+    "packaged_environment_files": 11,
+    "wheel_config_discovery_from_other_working_directory": true,
+    "locked_dependency_resolution": true
+  },
+  "parcc_checkpoint_compatibility": {
+    "exact": true,
+    "maximum_errors": {
+      "fourier_predicted_emb": 0.0,
+      "lewm_predicted_emb": 0.0,
+      "dinowm_predicted_emb": 0.0,
+      "dinowm_predicted_pixels_emb": 0.0,
+      "dinowm_predicted_action_emb": 0.0
+    },
+    "input": "Recorded validation images/actions, Fourier context1 and LeWM/DINO context3, three future five-action blocks",
+    "reference": "Original PARCC ablation-code snapshot c09e08abc5a0f12ac5a77aee53c4df0ea9e3d60c547dbcb34e105ac64f5974e3",
+    "scope": "Deterministic CPU rollout probe, not a full benchmark rerun"
+  },
+  "tworoom_existing_weights": {
+    "seeds": [
       42,
       43,
       44
     ],
-    "strict_load_and_finite_predictions": true,
-    "encoder_and_predictor_max_absolute_error_vs_frozen_source": 0.0,
-    "parity_input": "Deterministic synthetic pixel and command probe; not a complete evaluation parity claim",
-    "trained_checkpoint_simulator_smoke": [
-      "CEM",
-      "eight-start projected Gauss-Newton",
-      "eight-start Gauss-Newton with TV-LQR"
-    ],
-    "simulator_smoke_steps_per_controller": 3,
-    "training_source_sha256": "c4aee25dd8600d5a447889ef63813231da26679c94d1ce803823f075a816b447",
-    "evaluation_source_sha256": "c58bd88957950bceac1d22c3cff3c6ef263f857170a50c041d9efa253e3e94eb",
-    "training_objective": "One five-primitive-step endpoint per clip plus 0.09 SIGReg; not the requested three-endpoint experiment"
+    "strict_load_and_deterministic_inference_probe_exact": true,
+    "single_five_step_endpoint_per_clip": true,
+    "three_endpoint_training_claim": false
   },
   "limits": [
-    "Current checkout is newer than frozen PARCC training snapshots. Exact resume requires the original code/dependency identity and full resume checkpoint.",
-    "Local smoke checks do not rerun the complete 50-task benchmark or establish convergence or controller superiority.",
-    "Full release acceptance across all experimental environment adapters and cluster GPU configurations is incomplete. History-state dynamics support CEM; single-state SQP/TV-LQR cannot substitute."
+    "The cleaned checkout is newer than the frozen PARCC training snapshots. Exact resume requires the original source/dependency identity and full resume checkpoint.",
+    "Deterministic rollout probes and short pipeline tests do not reproduce a complete benchmark or prove convergence. Longer PointMaze pilot results are recorded outside Git.",
+    "Full acceptance across all experimental adapters and cluster GPU configurations remains incomplete. Native-force history dynamics support CEM; single-state SQP/TV-LQR cannot substitute."
   ]
 }

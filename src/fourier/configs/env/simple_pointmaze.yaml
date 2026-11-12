@@ -1,0 +1,26 @@
+# simple_pointmaze: project; 10 epochs; source training context 3.
+# Default evaluation: dataset_goal, goal offset 25, budget 50, horizon 25, replan 25.
+# CEM: 300 candidates, 30 elites, 30 iterations. Fourier rate-input state uses one image.
+environment:
+  name: simple_pointmaze
+  id: swm/SimplePointMaze-v0
+  family: simple_pointmaze
+  kwargs:
+    show_goal: false
+  image_size: 224
+  action:
+    kinds: [delta, delta]
+    scale: [1.0, 1.0]
+    dt: 1.0
+    units: [world_unit/step, world_unit/step]
+    low: [-0.2, -0.2]
+    high: [0.2, 0.2]
+  # Used only with --collect; --download uses the pinned release below when available.
+  collection:
+    policy: random
+    episodes: 1000
+    max_episode_steps: 200
+    seed: 3072
+  # Legacy environment tag; the selected paper/project protocol is resolved separately.
+  benchmark: project_extension
+  dataset: custom

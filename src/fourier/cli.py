@@ -26,6 +26,11 @@ def main(argv=None):
     parser.add_argument("--archive", help="Original author archive for provenance verification")
     parser.add_argument("--split")
     parser.add_argument("--collect", action="store_true")
+    parser.add_argument(
+        "--download",
+        action="store_true",
+        help="Download and prepare the pinned release in --output",
+    )
     parser.add_argument("--episodes", type=int)
     parser.add_argument(
         "--resume-data",
@@ -46,6 +51,8 @@ def main(argv=None):
         help="Repeatable override of the source training config, e.g. num_workers=0",
     )
     args, overrides = parser.parse_known_args(argv)
+    if args.download and args.command != "prepare-data":
+        parser.error("--download belongs to prepare-data")
     if any("=" not in item for item in overrides):
         parser.error("Config overrides must be key=value")
     os.environ.setdefault("MUJOCO_GL", "egl")
@@ -83,6 +90,19 @@ def main(argv=None):
             cfg.preparation[key] = getattr(args, key)
         args.collect = args.collect or cfg.preparation.collect
         cfg.preparation.collect = args.collect
+        args.download = args.download or cfg.preparation.get("download", False)
+        cfg.preparation.download = args.download
+        if args.download and (
+            args.collect
+            or args.source
+            or args.archive
+            or args.source_url
+            or args.revision
+            or args.expected_sha256
+        ):
+            parser.error(
+                "--download uses the pinned catalog; omit --collect and manual source/archive/provenance options"
+            )
     if args.export_config:
         destination = Path(args.export_config).expanduser()
         if destination.exists():
@@ -111,6 +131,25 @@ def main(argv=None):
     if args.command == "prepare-data":
         from .data import prepare_manifest
 
+        if args.download:
+            if not args.output:
+                parser.error("--download requires an output directory via --output")
+            from .download import prepare_download
+
+            print(
+                json.dumps(
+                    prepare_download(
+                        OmegaConf.to_container(cfg.environment, resolve=True),
+                        args.output,
+                        catalog=args.catalog,
+                        split=args.split,
+                        resume=args.resume_data,
+                        limit=args.episodes,
+                    ),
+                    indent=2,
+                )
+            )
+            return
         if not args.source or not args.output:
             parser.error("prepare-data requires --source and --output")
         env = OmegaConf.to_container(cfg.environment, resolve=True)
