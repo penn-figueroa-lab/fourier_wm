@@ -1,5 +1,17 @@
 # Shared protocols, planners and publication priority. Environment/data details are in env/*.yaml.
 protocol:
+  deformable:
+    name: deformable_dataset_goal
+    allowed_environments: [rope, granular]
+    num_eval: 100
+    goal_offset: 5
+    budget: 5
+    horizon_steps: 5
+    replan_steps: 1
+    feedback: false
+    feedback_q: 1.0
+    feedback_r: 1.0
+    budget_status: Project comparison on held-out dataset goals; one step is a complete push, not a physics step. Not published DINO-WM/LaLa task sampling.
   dinowm_paper:
     name: d4rl_image_history
     allowed_environments: [dinowm_pointmaze]
@@ -154,3 +166,11 @@ papers:
   dinowm: https://arxiv.org/html/2411.04983v2
   lewm_code_revision: 8edfeb336732b5f3ce7b8b210d0ba370a09e2cac
   dinowm_code_revision: 0a9492fa12044b852ae9e001cc74604b79c8bb0c
+deformable_release:
+  source: https://huggingface.co/datasets/gaoyuezhou/dino_wm
+  revision: d5c69e8fe60c3ed6b01d2f6e88fbfd66be078e57
+  files:
+    deformable.z01: b7775cfa1ccf967ddc7c58346b150baeb2b7751ce7db7da1baa9172f2b893a39
+    deformable.z02: 54d20ce4b0d618f75a4e46812c455e8f738c9e0b9c7a9e8b1cdb0a85080f2221
+    deformable.z03: 22da19d6d4f42fd9ce004bf4f3fe00e0dc1e7651aa7b2362c0860f9b664a4281
+    deformable.zip: 96a6737e4de8bbf88d4fd8b484aa2e4ee4a94d202fb29ff5993eac4a0aaa2b4a

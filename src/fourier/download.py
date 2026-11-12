@@ -169,6 +169,17 @@ def _prepare_download(environment, output, *, catalog, split, resume, limit):
         return import_ogbench_pointmaze(output / "raw", output, resume=resume, limit=limit)
     entries = dataset_catalog()
     entry = entries.get(catalog, {})
+    if (
+        entry.get("format") == "dinowm_deformable"
+        and entry.get("environment") == environment["name"]
+    ):
+        if split not in {None, "train"} or limit is not None:
+            raise ValueError(
+                "Deformable releases prepare the complete original train/validation episode split"
+            )
+        from .deformable import prepare_release
+
+        return prepare_release(entry, environment, output, catalog, resume=resume)
     if entry.get("format") == "lance" and entry.get("environment") == environment["name"]:
         if limit is not None or split not in {None, "train"}:
             raise ValueError("Lance releases prepare complete train/validation/test episode splits")
@@ -225,7 +236,9 @@ def prepare_lance(entry, environment, output, catalog):
         destination = raw / name
         fetch(
             f"{entry['source']}/resolve/{entry['revision']}/{entry['artifact']}/{name}",
-            destination, digest, progress=output / "progress.json",
+            destination,
+            digest,
+            progress=output / "progress.json",
         )
         # Download locks are not part of the immutable author's dataset.
         destination.with_name(destination.name + ".download.lock").unlink(missing_ok=True)
@@ -250,15 +263,21 @@ def prepare_lance(entry, environment, output, catalog):
         if manifest.exists():
             value = read_manifest(manifest)
             if (
-                value.get("catalog", {}).get("id") != catalog or value["environment"] != environment
-                or value["source"] != entry["source"] or value["revision"] != entry["revision"]
+                value.get("catalog", {}).get("id") != catalog
+                or value["environment"] != environment
+                or value["source"] != entry["source"]
+                or value["revision"] != entry["revision"]
                 or value.get("origin", {}).get("sha256") != entry["tree_sha256"]
             ):
-                raise ValueError("Prepared Lance manifest belongs to a different release/environment")
+                raise ValueError(
+                    "Prepared Lance manifest belongs to a different release/environment"
+                )
         else:
             view = output / f"{role}.lance"
             if view.exists():
-                raise FileExistsError(f"Incomplete view {view}; inspect it before removing and resuming")
+                raise FileExistsError(
+                    f"Incomplete view {view}; inspect it before removing and resuming"
+                )
             temporary = output / f".prepare-{uuid.uuid4().hex}.lance"
             try:
                 clone = source.shallow_clone(temporary, source.version)
@@ -266,15 +285,28 @@ def prepare_lance(entry, environment, output, catalog):
                 clone.delete("episode_idx NOT IN (" + ",".join(map(str, selected)) + ")")
                 temporary.rename(view)
                 value = prepare_manifest(
-                    view, manifest, environment, source_url=entry["source"],
-                    revision=entry["revision"], split=role, catalog=catalog,
-                    origin={"path": str(raw), "sha256": entry["tree_sha256"],
-                            "episode_indices": sorted(map(int, selected)),
-                            "excluded_columns": entry["excluded_columns"],
-                            "split_seed": entry["split_seed"], "version": source.version},
+                    view,
+                    manifest,
+                    environment,
+                    source_url=entry["source"],
+                    revision=entry["revision"],
+                    split=role,
+                    catalog=catalog,
+                    origin={
+                        "path": str(raw),
+                        "sha256": entry["tree_sha256"],
+                        "episode_indices": sorted(map(int, selected)),
+                        "excluded_columns": entry["excluded_columns"],
+                        "split_seed": entry["split_seed"],
+                        "version": source.version,
+                    },
                 )
             finally:
                 shutil.rmtree(temporary, ignore_errors=True)
-        result[role] = {"manifest": str(manifest), "identity": value["identity"], "episodes": value["episodes"]}
+        result[role] = {
+            "manifest": str(manifest),
+            "identity": value["identity"],
+            "episodes": value["episodes"],
+        }
     atomic_json(output / "splits.json", result)
     return result

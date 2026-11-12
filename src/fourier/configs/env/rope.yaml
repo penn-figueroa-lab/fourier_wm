@@ -1,0 +1,44 @@
+# DINO-WM endpoint release; each action executes a complete variable-duration push.
+environment:
+  name: rope
+  id: fourier/Rope-v1
+  family: deformable
+  kwargs:
+    object_name: rope
+  image_size: 224
+  observation_keys: [pixels]
+  rendering:
+    engine: pyflex
+    camera_view: 1
+    image_order: RGB
+  action:
+    kinds: [push, push, push, push]
+    scale: [1, 1, 1, 1]
+    dt: 1.0  # Abstract push index; not a duration in seconds.
+    units: [scene_coordinate, scene_coordinate, scene_coordinate, scene_coordinate]
+    low: [-4, -4, -4, -4]
+    high: [4, 4, 4, 4]
+  evaluation:
+    chamfer_threshold: 0.675
+    metric_source: https://arxiv.org/html/2610.27851#A4.T8
+  collection:
+    policy: official_release
+    episodes: 1000
+    max_episode_steps: 20
+    seed: null
+  benchmark: project_deformable_release
+  dataset: dinowm_rope
+dataset:
+  environment: rope
+  format: dinowm_deformable
+  source: ${deformable_release.source}
+  revision: ${deformable_release.revision}
+  files: ${deformable_release.files}
+  code_revision: 0a9492fa12044b852ae9e001cc74604b79c8bb0c
+  image_size: 224
+  released_episodes: 1000
+  released_episode_length: 20
+  split_episodes: {train: 900, validation: 100}
+  split_fraction: 0.9
+  split_seed: 42
+  collection_policy: Original DINO-WM random complete pushes, native four-coordinate action unchanged

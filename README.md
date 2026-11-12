@@ -65,6 +65,7 @@ There is **one** config directory: [`src/fourier/configs/`](src/fourier/configs)
 | [Cube](src/fourier/configs/env/cube.yaml) | SWM Table 1; **LeWM-collected expert release**, not OGBench play | 3 / 1 image | XYZ, yaw, gripper displacement → separate rates |
 | [Two-Room](src/fourier/configs/env/tworoom.yaml) | LeWM; author heuristic release | 1 / 1 image | Relative XY ×5 per 0.1s → pixel/s |
 | [OGBench PointMaze](src/fourier/configs/env/pointmaze.yaml) | Official navigate release; project comparison | 3 / 1 image | Displacement ×0.2 per 0.1s → rate |
+| [Rope](src/fourier/configs/env/rope.yaml), [Granular](src/fourier/configs/env/granular.yaml) | DINO-WM release; project baseline adaptation | 1 / dense-motion replay required | Complete push endpoints; **not primitive velocity** |
 | [Scene](src/fourier/configs/env/scene.yaml) | SWM released visual data; project episode-holdout comparison | 3 / 1 image | XYZ, yaw, gripper displacement → separate rates |
 | Fetch, SimplePointMaze | Explicit seeded project collections | 3 / 1 image | Native displacement → configured rates |
 
@@ -73,6 +74,23 @@ The priority is **SWM > LeWM > DINO-WM** for the exact published benchmark. Push
 LeWM encodes frames separately before its temporal predictor. Fourier rate-input dynamics use the current frame's latent. Force/torque inputs retain native units and require causal adjacent image history; the optional DINO force-maze path is experimental and needs `scripts/install-legacy-maze.sh`. It is separate from OGBench PointMaze and is not a current campaign target.
 
 Use `fourier-wm train ... --dry-run` to inspect the exact resolved source recipe before training. `--train-option key=value` overrides source settings; paper profiles reject incompatible overrides. `--export-config /path/experiment.yaml` saves the resolved experiment. Layout, clipping, normalization or task changes must be reported rather than silently called the same benchmark.
+
+## Rope and Granular imports
+
+Both tasks share one pinned split ZIP release (about 16 GB). Install the `zip` command, then prepare either or both:
+
+```bash
+fourier-wm prepare-data --environment rope --download --output "$FOURIER_DATA/deformable"
+fourier-wm prepare-data --environment granular --download --output "$FOURIER_DATA/deformable"
+```
+
+The second command reuses the verified download. Existing parts can be supplied with `--source /data/raw_parts` instead of `--download`. Each task produces `rope/` or `granular/` with `train.h5`, `validation.h5`, manifests and conversion progress. Add `--resume-data` after an interrupted conversion. Leave roughly 50 GB free for original parts, the joined archive, source tensors and both converted tasks. Only declared tensor members are read; the archive is never unpacked wholesale.
+
+Imports preserve the released 1,000 × 20 observation/action records per task, integer RGB values, native four-coordinate push actions, particle states and dummy proprioception. The source `torch.randperm(seed=42)` split holds out 100 complete episodes; there is no separate released test split. Particle states are reset/metric data, excluded from model observations. The unchanged SWM reader loads the HDF5s directly. LeWM/DINO-WM training adapters use one-image context, frameskip one, external validation and a project label; this does not claim exact paper reproduction.
+
+**One transition executes an entire variable-duration push** `[start_x,start_z,end_x,end_z]`. Fourier training/SQP/TV-LQR reject these endpoint actions. Dense images, commanded tool motion and timing must be replayed and validated before training our primitive-rate dynamics. Subtracting endpoints loses the push's contact location and is insufficient.
+
+Optional baseline CEM execution uses the DINO-WM PyFlex backend at commit `0a9492fa12044b852ae9e001cc74604b79c8bb0c`, selected by `DINO_WM_ROOT`. Follow that project's optional deformable-runtime installation separately; data import needs no PyFlex, Gym or PyBullet installation. The bridge requires one environment per process. Real PyFlex replay and B200/MIG compatibility must pass on allocated hardware before launching evaluations. The default is a **project** held-out dataset-goal protocol with five complete pushes, replanning after each; Chamfer thresholds come from LaLa-World, whose task sampler and published rates are not interchangeable with this protocol. `doctor --environment rope` reports these boundaries.
 
 ## Test shared weights
 

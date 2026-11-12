@@ -11,7 +11,7 @@
   },
   "configuration": {
     "canonical_location": "src/fourier/configs",
-    "environment_files": 11,
+    "environment_files": 13,
     "project_docs_consolidated_into_readme": true,
     "root_config_alias_removed": true,
     "resolved_configurations_compared": 66,
@@ -37,7 +37,7 @@
     }
   },
   "portability": {
-    "packaged_environment_files": 11,
+    "packaged_environment_files": 13,
     "wheel_config_discovery_from_other_working_directory": true,
     "locked_dependency_resolution": true
   },
@@ -100,8 +100,8 @@
       "scope": "One-episode official-release smoke export, warm local cache, RTX3090Ti, optimizer lr=0, no Lightning/checkpoint overhead; concurrent local work possible. Not a PARCC or full-campaign speed claim."
     }
   },
-  "previous_source_code_sha256": "21dd1a33c7d143a3fa69122bc4d173e2369176322f63c31164bc8b6c1c4fb6a8",
-  "source_code_sha256": "1e060e806ac020a9455a9f4882c6e19ea6e9e3d3f7cd8e8df94d15530d6b5868",
+  "previous_source_code_sha256": "1e060e806ac020a9455a9f4882c6e19ea6e9e3d3f7cd8e8df94d15530d6b5868",
+  "source_code_sha256": "7d8364eb606666835e57e91e19c7a1d6da8d359479a21f6d07b4e5de715f4bdb",
   "scene": {
     "external_checks": 7,
     "regression_checks": 41,
@@ -119,18 +119,6 @@
   },
   "previous_validation": {
     "package": "fourier-wm-validation",
-    "version": "0.9.3",
-    "revision": "2da2fb452677e4458dc9dec1f68df4fcd2d83367",
-    "wheel": "fourier_wm_validation-0.9.3-py3-none-any.whl",
-    "wheel_sha256": "f5531fcf76ce41cace0ed4bf9e9ed20bcb69c9f8ac2fe234b8d3f081805b6ed1",
-    "final_suite": {
-      "passed": 164,
-      "failed": 0,
-      "seconds": 140.4
-    }
-  },
-  "validation": {
-    "package": "fourier-wm-validation",
     "version": "0.9.4",
     "revision": "90b22906fc5b64d512d71549d40455bb80dda020",
     "wheel": "fourier_wm_validation-0.9.4-py3-none-any.whl",
@@ -139,6 +127,55 @@
       "passed": 48,
       "failed": 0,
       "scope": "Scene plus download, protocol and release regressions; previous full-suite record retained separately"
+    }
+  },
+  "validation": {
+    "package": "fourier-wm-validation",
+    "version": "0.9.5",
+    "revision": "8d75ed53c81eaa99f4a717bc230fba6256f3c4fc",
+    "wheel": "fourier_wm_validation-0.9.5-py3-none-any.whl",
+    "wheel_sha256": "fffaf32a77b59ebf0117c3d6e56e459b726ea4991bcf2db4a751490d6fced249",
+    "local_results": {
+      "broad_suite": {
+        "passed": 176,
+        "failed": 1,
+        "skipped": 2,
+        "failure": "Outdated Scene custom-data fixture; updated to assert the required provenance rejection"
+      },
+      "final_focused_suite": {
+        "passed": 13,
+        "failed": 0,
+        "scope": "12 deformable checks plus corrected Scene guard"
+      },
+      "scope": "Broad regression suite plus focused reruns; full current suite to be checked in allocated PARCC job"
+    }
+  },
+  "deformable": {
+    "scope": "Released Rope/Granular import and optional native-push baseline bridge; not primitive-rate Fourier training",
+    "release_revision": "d5c69e8fe60c3ed6b01d2f6e88fbfd66be078e57",
+    "original_code_revision": "0a9492fa12044b852ae9e001cc74604b79c8bb0c",
+    "episode_split": "900 train / 100 validation per task, original torch.randperm seed42",
+    "time_unit": "one variable-duration complete push",
+    "local_focused_checks": 12,
+    "interrupted_conversion_recovery": true,
+    "zero_and_spawn_workers": [
+      0,
+      2
+    ],
+    "data_move_preserves_identity": true,
+    "full_release_import": "pending download completion",
+    "native_pyflex_replay": "not validated; separate optional runtime required",
+    "b200_mig_pyflex_compatibility": "not validated",
+    "old_configuration_parity": {
+      "configurations": 66,
+      "differences": 0
+    },
+    "vendored_upstream": {
+      "ok": true,
+      "expected_tree": "b4ea0f6e08ddd22c2fc74344de2f5577b9f563ed",
+      "manifest_tree": "b4ea0f6e08ddd22c2fc74344de2f5577b9f563ed",
+      "changed": [],
+      "checked_files": 357
     }
   }
 }

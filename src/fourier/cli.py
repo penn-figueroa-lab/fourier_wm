@@ -35,7 +35,7 @@ def main(argv=None):
     parser.add_argument(
         "--resume-data",
         action="store_true",
-        help="Resume an interrupted official PointMaze image export",
+        help="Resume an interrupted dataset conversion at its last complete episode",
     )
     parser.add_argument("--execute", action="store_true", help="Submit a generated Slurm script")
     parser.add_argument(
@@ -153,6 +153,38 @@ def main(argv=None):
         if not args.source or not args.output:
             parser.error("prepare-data requires --source and --output")
         env = OmegaConf.to_container(cfg.environment, resolve=True)
+        if env["family"] == "deformable":
+            if (
+                args.collect
+                or args.archive
+                or args.source_url
+                or args.revision
+                or args.expected_sha256
+                or args.catalog not in {None, env["dataset"]}
+            ):
+                parser.error(
+                    "Deformable import uses pinned split ZIPs in --source; omit collection/manual provenance options"
+                )
+            from .deformable import prepare_release
+            from .data import dataset_catalog
+
+            if args.episodes is not None or args.split != "train":
+                parser.error("Deformable import prepares the complete train/validation split")
+            entry = dataset_catalog()[env["dataset"]]
+            print(
+                json.dumps(
+                    prepare_release(
+                        entry,
+                        env,
+                        args.output,
+                        env["dataset"],
+                        raw=args.source,
+                        resume=args.resume_data,
+                    ),
+                    indent=2,
+                )
+            )
+            return
         if args.catalog == "ogbench_pointmaze_navigate":
             if env["name"] != "pointmaze" or args.collect:
                 parser.error(
@@ -230,6 +262,17 @@ def main(argv=None):
             "machine": cfg.machine.name,
             "upstream_verification": verify_upstream(),
         }
+        if cfg.environment.family == "deformable":
+            import importlib.util
+
+            report["deformable"] = {
+                "dataset_import": "supported without PyFlex",
+                "native_action": "complete push [start_x,start_z,end_x,end_z]",
+                "fourier_training": "requires dense commanded-motion replay",
+                "pyflex_importable": importlib.util.find_spec("pyflex") is not None,
+                "simulator_root": os.environ.get("DINO_WM_ROOT"),
+                "simulator_gpu_validation": "not established by this doctor check",
+            }
         for hook in entry_points(group="fourier_wm.before_command"):
             hook.load()(args, cfg)
         for hook in entry_points(group="fourier_wm.doctor"):

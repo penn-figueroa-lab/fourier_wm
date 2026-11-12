@@ -12,7 +12,7 @@ from .runtime import atomic_json, fingerprint, tree_hash, file_hash, load_catalo
 def dataset_catalog():
     from omegaconf import OmegaConf
 
-    return OmegaConf.to_container(load_catalog().datasets)
+    return OmegaConf.to_container(load_catalog().datasets, resolve=True)
 
 
 def require_paper_dataset(manifest, environment):
@@ -88,7 +88,7 @@ def prepare_manifest(
     adapter = ActionAdapter(environment["action"])
     raw = ds.get_col_data("action")
     q = ds.get_col_data(adapter.spec.position_key) if adapter.state_dependent else None
-    converted = adapter.to_model(raw, q)
+    converted = raw if environment["family"] == "deformable" else adapter.to_model(raw, q)
     terminals = np.asarray(ds.offsets) + np.asarray(ds.lengths) - 1
     valid = np.isfinite(converted).all(-1)
     invalid = np.flatnonzero(~valid)
@@ -119,12 +119,20 @@ def prepare_manifest(
         verified = checksum in approved
         if entry.get("format") == "lance":
             verified = bool(
-                origin and origin["sha256"] == entry["tree_sha256"]
+                origin
+                and origin["sha256"] == entry["tree_sha256"]
                 and tree_hash(origin["path"]) == origin["sha256"]
                 and origin["excluded_columns"] == entry["excluded_columns"]
             )
             if not verified or len(ds.lengths) != len(origin["episode_indices"]):
-                raise ValueError("Lance view requires its verified immutable source and episode selection")
+                raise ValueError(
+                    "Lance view requires its verified immutable source and episode selection"
+                )
+        elif entry.get("format") == "dinowm_deformable":
+            from .deformable import verify_origin
+
+            verify_origin(entry, origin, split, len(ds.lengths), base=path.parent)
+            verified = True
         if not verified and archive:
             if file_hash(archive) != entry["archive_sha256"]:
                 raise ValueError("Compressed source differs from the author release checksum")
@@ -133,7 +141,9 @@ def prepare_manifest(
             raise ValueError(
                 "Unverified paper data: provide --archive for the pinned author archive; official OGBench NPZ/custom collections cannot substitute for LeWM data"
             )
-        expected_episodes = entry.get("split_episodes", {}).get(split, entry.get("released_episodes"))
+        expected_episodes = entry.get("split_episodes", {}).get(
+            split, entry.get("released_episodes")
+        )
         if (expected_episodes is not None and len(ds.lengths) != expected_episodes) or (
             "released_frames" in entry and sum(ds.lengths) != entry["released_frames"]
         ):
@@ -179,7 +189,9 @@ def prepare_manifest(
             "outside_declared_space": int(outside.sum()),
             "training_actions_clipped": False,
         },
-        "conversion": "lazy_dense_before_subsampling",
+        "conversion": "native_push_endpoints_preserved"
+        if environment["family"] == "deformable"
+        else "lazy_dense_before_subsampling",
         "native_data_modified": False,
         "catalog": proof,
         "collection_settings": collection,
@@ -197,7 +209,10 @@ def prepare_manifest(
     }
     if origin:
         result["origin"] = origin
-        result["split_policy"] = "fixed disjoint episode holdout: 90% train, 5% validation, 5% test; no image/action rewrite"
+        result["split_policy"] = origin.get(
+            "split_policy",
+            "fixed disjoint episode holdout: 90% train, 5% validation, 5% test; no image/action rewrite",
+        )
     result["identity"] = fingerprint({k: v for k, v in result.items() if k != "path"})
     output = Path(output)
     if output.exists():
@@ -221,7 +236,17 @@ def read_manifest(path, *, verify=True):
         raise ValueError("Dataset content differs from the verified manifest")
     if verify and value.get("origin"):
         origin = value["origin"]
-        if tree_hash(origin["path"]) != origin["sha256"]:
+        if origin.get("format") == "dinowm_deformable":
+            from .deformable import verify_origin
+
+            verify_origin(
+                dataset_catalog()[value["catalog"]["id"]],
+                origin,
+                value["split"],
+                value["episodes"],
+                base=Path(value["path"]).parent,
+            )
+        elif tree_hash(origin["path"]) != origin["sha256"]:
             raise ValueError("Lance view source content differs from its pinned release")
     return value
 

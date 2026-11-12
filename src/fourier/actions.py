@@ -24,8 +24,11 @@ class ActionSpec:
         n = len(self.kinds)
         if not n or any(len(v) != n for v in (self.scale, self.units, self.low, self.high)):
             raise ValueError("Action channel descriptions must have equal, nonzero widths")
-        if any(k not in {"velocity", "delta", "position", "force", "torque"} for k in self.kinds):
-            raise ValueError("Use velocity, delta, position, force or torque commands")
+        if any(
+            k not in {"velocity", "delta", "position", "force", "torque", "push"}
+            for k in self.kinds
+        ):
+            raise ValueError("Unknown action semantics")
         if not np.isfinite(self.dt) or self.dt <= 0:
             raise ValueError("A positive control interval is required")
         if not np.isfinite([*self.scale, *self.low, *self.high]).all():
@@ -77,6 +80,10 @@ class ActionAdapter:
         torque channels retain their declared scaling and are never divided by dt.
         These coordinates alone do not supply an inertial model's hidden velocity.
         """
+        if "push" in self.spec.kinds:
+            raise ValueError(
+                "A complete push is not a primitive rate; replay dense commanded motion before Fourier training"
+            )
         if action.shape[-1] != len(self.spec.kinds):
             raise ValueError("Action width does not match its declared semantics")
         denominator = self._constant(
@@ -87,6 +94,8 @@ class ActionAdapter:
         ) / denominator
 
     def to_native(self, command, proprio=None, *, clip=False):
+        if "push" in self.spec.kinds:
+            raise ValueError("A complete push has no primitive-rate inverse")
         if command.shape[-1] != len(self.spec.kinds):
             raise ValueError("Command width does not match its declared semantics")
         denominator = self._constant(

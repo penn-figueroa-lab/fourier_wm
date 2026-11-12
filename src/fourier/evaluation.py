@@ -434,6 +434,15 @@ def evaluate(cfg):
         if not isinstance(cfg.protocol[key], int) or cfg.protocol[key] < 1:
             raise ValueError(f"Set a positive integer protocol.{key} for this benchmark")
     envspec = OmegaConf.to_container(cfg.environment, resolve=True)
+    if envspec["family"] == "deformable":
+        if cfg.planner.name != "cem" or cfg.protocol.feedback:
+            raise ValueError(
+                "Complete-push deformable benchmarks support native-action CEM, not primitive SQP/TV-LQR"
+            )
+        if manifest["split"] != "validation":
+            raise ValueError(
+                "Deformable project evaluation requires the held-out validation manifest"
+            )
     if (
         envspec.get("observation_keys") == ["pixels"]
         and envspec["family"] == "pointmaze"
@@ -506,6 +515,12 @@ def evaluate(cfg):
 
     model = load_pretrained(checkpoint).to(cfg.machine.device).eval().requires_grad_(False)
     metadata = checkpoint_metadata(model, checkpoint, envspec)
+    if envspec["family"] == "deformable" and (
+        metadata["model_family"] == "fourier" or metadata["action_block"] != 1
+    ):
+        raise ValueError(
+            "Deformable release evaluation requires a native complete-push baseline checkpoint with action_block=1"
+        )
     if paper and metadata["action_block"] != 5:
         raise ValueError("Paper evaluation requires a five-primitive-step action block")
     if metadata.get("action_spec") and fingerprint(metadata["action_spec"]) != fingerprint(
@@ -626,11 +641,16 @@ def evaluate(cfg):
                     "steps": steps,
                     "observation_to_action_seconds": latencies,
                 }
+                if envspec["family"] == "deformable":
+                    record["chamfer_distance"] = env.unwrapped.chamfer()
+                    record["time_unit"] = "complete_push"
                 if envspec["family"] == "scene":
                     cubes, buttons, drawer, window = env.unwrapped._compute_successes()
                     record["object_success"] = {
-                        "cube": bool(all(cubes)), "buttons": bool(all(buttons)),
-                        "drawer": bool(drawer), "window": bool(window),
+                        "cube": bool(all(cubes)),
+                        "buttons": bool(all(buttons)),
+                        "drawer": bool(drawer),
+                        "window": bool(window),
                     }
                 records.append(record)
                 atomic_json(directory / "episodes.json", records)

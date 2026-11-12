@@ -64,7 +64,8 @@ def compose(name="experiment", overrides=()):
     if selectors.get("machine", "local") != "local":
         raise ValueError("Site machine profiles belong in an external --config file")
     policy = benchmark_policy(environment)
-    protocol = selectors.get("protocol", policy["protocol"])
+    deformable = catalog.environment[environment].family == "deformable"
+    protocol = selectors.get("protocol", "deformable" if deformable else policy["protocol"])
     planner = selectors.get("planner", "cem")
     cfg = OmegaConf.load(CONFIG_ROOT / "experiment.yaml")
     cfg.environment = catalog.environment[environment]
@@ -73,6 +74,11 @@ def compose(name="experiment", overrides=()):
         policy["authority"] + "_paper" if policy["authority"] != "project" else "project"
     )
     cfg.dataset.id = cfg.environment.dataset
+    if deformable:
+        cfg.dataset.frameskip = 1
+        cfg.history_len = 1
+        cfg.training_profile = "project"
+        cfg.dataset.regime = "dinowm_push_endpoints"
     if environment == "pointmaze":
         cfg.dataset.regime = "official_navigate"
     cfg.protocol = catalog.protocol[protocol]
@@ -124,7 +130,9 @@ def training_config(experiment):
 
         require_paper_dataset(manifest, "scene")
         if not experiment.dataset.validation_manifest:
-            raise ValueError("Scene requires dataset.validation_manifest=/data/scene/validation.json from --download")
+            raise ValueError(
+                "Scene requires dataset.validation_manifest=/data/scene/validation.json from --download"
+            )
     if environment["name"] == "pointmaze" and experiment.dataset.regime == "official_navigate":
         expected_source = (
             "https://rail.eecs.berkeley.edu/datasets/ogbench/pointmaze-large-navigate-v0.npz"
@@ -171,6 +179,23 @@ def training_config(experiment):
 
         require_paper_dataset(manifest, experiment.environment.name)
     family = experiment.model_family
+    deformable = environment["family"] == "deformable"
+    if deformable:
+        if family == "fourier":
+            raise ValueError(
+                "Rope/Granular releases contain complete pushes, not primitive velocities. Import is supported; Fourier training requires dense commanded-motion replay, not endpoint subtraction."
+            )
+        from .data import require_paper_dataset
+
+        require_paper_dataset(manifest, environment["name"])
+        if (
+            experiment.dataset.frameskip != 1
+            or not experiment.dataset.validation_manifest
+            or profile != "project"
+        ):
+            raise ValueError(
+                "Deformable baseline adaptation requires frameskip=1, project labeling and its held-out validation manifest"
+            )
     force_maze = environment["name"] == "dinowm_pointmaze"
     if force_maze and environment.get("observation_keys") != ["pixels"]:
         raise ValueError(
@@ -218,6 +243,14 @@ def training_config(experiment):
         # Otherwise LeWM's source seed (3072) silently overrides this CLI's seed.
         cfg.seed = experiment.seed
         explicit = {item.lstrip("+").split("=", 1)[0] for item in overrides}
+        if deformable:
+            if (
+                "wm.history_size" in explicit and cfg.wm.history_size != 1
+            ) or cfg.wm.num_preds != 1:
+                raise ValueError(
+                    "The deformable endpoint preset uses one image and one complete-push target"
+                )
+            cfg.wm.history_size = 1
         if experiment.machine.num_workers is not None and "num_workers" not in explicit:
             cfg.num_workers = experiment.machine.num_workers
         if "trainer.accelerator" not in explicit:
@@ -291,14 +324,29 @@ def training_config(experiment):
                 raise ValueError("Invalid validation manifest")
             cfg.validation_dataset = val["path"]
             cfg.validation_identity = val["identity"]
+            if deformable:
+                require_paper_dataset(val, environment["name"])
+                a, b = manifest["origin"], val["origin"]
+                if a["sha256"] != b["sha256"] or set(a["episode_indices"]) & set(
+                    b["episode_indices"]
+                ):
+                    raise ValueError(
+                        "Deformable train/validation must hold out complete disjoint source episodes"
+                    )
             if environment["name"] == "scene":
                 require_paper_dataset(val, "scene")
                 train_origin, val_origin = manifest.get("origin", {}), val.get("origin", {})
-                if not train_origin or not val_origin or (
-                    train_origin["sha256"] != val_origin["sha256"]
-                    or set(train_origin["episode_indices"]) & set(val_origin["episode_indices"])
+                if (
+                    not train_origin
+                    or not val_origin
+                    or (
+                        train_origin["sha256"] != val_origin["sha256"]
+                        or set(train_origin["episode_indices"]) & set(val_origin["episode_indices"])
+                    )
                 ):
-                    raise ValueError("Scene train/validation must be disjoint episodes of the same pinned release")
+                    raise ValueError(
+                        "Scene train/validation must be disjoint episodes of the same pinned release"
+                    )
             if (
                 environment["name"] == "dinowm_pointmaze"
                 and experiment.dataset.regime == "dinowm_release"

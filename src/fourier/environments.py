@@ -23,6 +23,10 @@ def button_state(row, index):
 
 
 def make_env(spec, budget):
+    if spec["family"] == "deformable":
+        from .deformable_env import DeformableEnv
+
+        return DeformableEnv(spec, budget)
     if spec["family"] == "d4rl_maze":
         from .legacy_maze import make_env as legacy_env
 
@@ -59,6 +63,11 @@ def validate_action_semantics(env, spec):
             or not np.isclose(action.dt, 1 / base.control_hz)
         ):
             raise ValueError("Push-T relative command scale/control interval mismatch")
+    elif family == "deformable":
+        if action.kinds != ("push",) * 4 or not np.allclose(action.scale, 1.0):
+            raise ValueError(
+                "Deformable actions are native [start_x,start_z,end_x,end_z] complete pushes"
+            )
     elif family == "pointmaze":
         from ogbench.locomaze.point import PointEnv
 
@@ -92,7 +101,9 @@ def validate_action_semantics(env, spec):
         if family == "scene" and (
             not np.isclose(action.dt, base._control_timestep) or base._mode != "task"
         ):
-            raise ValueError("Scene requires the configured control interval and all-object task success")
+            raise ValueError(
+                "Scene requires the configured control interval and all-object task success"
+            )
     elif family in {"tworoom", "simple_pointmaze"}:
         speed = np.asarray(base.variation_space["agent"]["speed"].value).item()
         if not np.allclose(action.scale, speed):
@@ -114,7 +125,9 @@ def restore(env, spec, start, goal, seed):
     """Restore physical state and goal without taking an unrecorded action."""
     family, base = spec["family"], env.unwrapped
     env.reset(seed=int(seed), options={"variation": []})
-    if family == "pusht":
+    if family == "deformable":
+        base.set_task(row_value(start, "state"), row_value(goal, "state"))
+    elif family == "pusht":
         base._set_state(row_value(start, "state"))
         base._set_goal_state(row_value(goal, "state"))
     elif family == "tworoom":
@@ -132,10 +145,7 @@ def restore(env, spec, start, goal, seed):
         base.set_goal_state(row_value(goal, "state"))
     elif family in {"cube", "scene"}:
         buttons = (
-            {
-                f"button_state_{i}": button_state(start, i)
-                for i in range(base._num_buttons)
-            }
+            {f"button_state_{i}": button_state(start, i) for i in range(base._num_buttons)}
             if family == "scene"
             else {}
         )
@@ -150,9 +160,7 @@ def restore(env, spec, start, goal, seed):
         if family == "scene":
             for i in range(base._num_buttons):
                 base._cur_button_states[i] = button_state(start, i)
-                base.set_target_button_state(
-                    i, button_state(goal, i)
-                )
+                base.set_target_button_state(i, button_state(goal, i))
             base._prev_button_states = base._cur_button_states.copy()
             base.set_target_drawer_pos(row_value(goal, "privileged/drawer_pos").item())
             base.set_target_window_pos(row_value(goal, "privileged/window_pos").item())
@@ -172,6 +180,8 @@ def restore(env, spec, start, goal, seed):
 
 def state_info(env, family):
     base = env.unwrapped
+    if family == "deformable":
+        return {"state": base.state.reshape(-1).copy(), "proprio": np.zeros(1, np.float32)}
     if family == "pusht":
         state = np.asarray(base._get_obs())
         return {"state": state, "proprio": np.concatenate((state[:2], state[-2:]))}
@@ -219,6 +229,8 @@ def state_info(env, family):
 
 def success(env, family):
     base = env.unwrapped
+    if family == "deformable":
+        return base.success()
     if family == "pusht":
         return bool(base.eval_state(base.goal_state, base._get_obs())[0])
     if family == "tworoom":
