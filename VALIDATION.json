@@ -100,8 +100,8 @@
       "scope": "One-episode official-release smoke export, warm local cache, RTX3090Ti, optimizer lr=0, no Lightning/checkpoint overhead; concurrent local work possible. Not a PARCC or full-campaign speed claim."
     }
   },
-  "previous_source_code_sha256": "46ee3067cbe1ff47c734b32c612c121aeb48814e4b6e1c8e7106a8f3d5752c09",
-  "source_code_sha256": "da05361c65be521f9bfcc627da8c4a7b324a126482ba29a0037602dff5142d97",
+  "previous_source_code_sha256": "da05361c65be521f9bfcc627da8c4a7b324a126482ba29a0037602dff5142d97",
+  "source_code_sha256": "ffa69a1312efb38239d1a6633230d4e85787f60788d7f60f4440f440aaeb9be4",
   "scene": {
     "external_checks": 7,
     "regression_checks": 41,
@@ -140,16 +140,16 @@
   },
   "validation": {
     "package": "fourier-wm-validation",
-    "version": "0.9.7",
-    "revision": "ef9aafa91b4ef2ed179d86b50fa19d7e3fc22bee",
-    "wheel": "fourier_wm_validation-0.9.7-py3-none-any.whl",
-    "wheel_sha256": "ed58d3665ed3deec2ffb5a663448cb6c7b8d810e455162cb0e08126b2ffaffbd",
+    "version": "0.9.8",
+    "revision": "765dece6efc9033e248eb98e5f51f357cdebccc1",
+    "wheel": "fourier_wm_validation-0.9.8-py3-none-any.whl",
+    "wheel_sha256": "d00d7c7380218aee5e50d79c04b7a6b949a76dac1e2e77e1261a2a52d636d9ba",
     "local_focused_suite": {
-      "passed": 41,
+      "passed": 42,
       "failed": 0,
-      "scope": "Dense causal commands, replay storage/recovery, native import, loader/training parity and exact interrupted training recovery"
+      "scope": "Native child driver/preload preservation plus prior causal-action, replay recovery, loader parity and exact training recovery checks"
     },
-    "parcc_dense_native_gpu": "pending allocated preflight"
+    "parcc_dense_native_gpu": "Failed preflight10505185 with EGL permission warnings/native crash; diagnosed launcher-path fix awaits allocated validation"
   },
   "deformable": {
     "scope": "Released Rope/Granular import and optional native-push baseline bridge; not primitive-rate Fourier training",
@@ -221,6 +221,15 @@
     },
     "parcc_native_gpu_check": "pending allocation",
     "complete_dense_exports": "pending allocated replay",
-    "primitive_closed_loop_evaluation": "not implemented; explicit error"
+    "primitive_closed_loop_evaluation": "not implemented; explicit error",
+    "runtime_recovery": {
+      "failed_job": "10505185",
+      "stage": "native EGL initialization before data or training",
+      "fix": "Preserve allocated-node driver search paths and preloads in isolated native child",
+      "local_nvidia_graphics_and_pyflex_probe": true,
+      "local_regression_checks": 42,
+      "full_models_restarted": false,
+      "b200_validation": "pending corrected preflight"
+    }
   }
 }

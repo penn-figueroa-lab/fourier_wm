@@ -400,10 +400,15 @@ def prepare_dense(
     env["PYTHONPATH"] = (
         str(Path(__file__).parents[1]) + os.pathsep + str(runtime / record["module_root"])
     )
-    env["LD_PRELOAD"] = str(runtime / record["glibc_compat"])
-    env["LD_LIBRARY_PATH"] = (
-        str(runtime / record["cuda_root"]) + os.pathsep + str(runtime / record["sdl_root"])
-    )
+    # Keep allocated-node driver paths/preloads. The legacy CUDA runtime must
+    # precede them, but replacing them can hide the NVIDIA EGL implementation.
+    for key, prefix in {
+        "LD_PRELOAD": str(runtime / record["glibc_compat"]),
+        "LD_LIBRARY_PATH": os.pathsep.join(
+            str(runtime / record[name]) for name in ("cuda_root", "sdl_root")
+        ),
+    }.items():
+        env[key] = prefix + (os.pathsep + env[key] if env.get(key) else "")
     destination = output / environment["name"]
     command = [
         str(runtime / ".venv/bin/python"),
