@@ -30,3 +30,5 @@ __pycache__/
 *.extracting
 *.download.lock
 *.extract.lock
+
+.ruff_cache/

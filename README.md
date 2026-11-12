@@ -1,6 +1,17 @@
 # Fourier World Model
 
-Fourier dynamics and MPC added around an unchanged, pinned [Stable World Model](https://github.com/galilai-group/stable-worldmodel) checkout. LeWM/DINO-WM reuse upstream models and losses. Fourier replaces LeWM's transformer and prediction head, removes action embedding, and advances five primitive transitions between sparse observations.
+Fourier dynamics and MPC around an unchanged, pinned [Stable World Model](https://github.com/galilai-group/stable-worldmodel). LeWM and DINO-WM reuse upstream architectures and losses. Fourier replaces LeWM’s transformer and prediction head, removes action embedding and makes five primitive transitions between sparse observations.
+
+## Layout
+
+| Path | Contents |
+|---|---|
+| `src/fourier/` | Dynamics, action conversion, training, planners and evaluation |
+| `src/fourier/configs/` | **The only config directory**: environment files, model/training adapters and shared benchmark profiles |
+| `scripts/` | Installation and a Two-Room checkpoint demo |
+| `stable-worldmodel/` | Unmodified upstream source; revision and license recorded in `UPSTREAM.json` |
+
+Datasets, weights, results, cluster settings and validation tools stay outside this repository. Work on `main`; completed experiments retain their original immutable source snapshots for exact resume.
 
 ## Install
 
@@ -14,85 +25,78 @@ export FOURIER_DATA=/absolute/path/to/datasets
 export FOURIER_RUNS=/absolute/path/to/runs
 ```
 
-Python 3.11/CUDA 12.8 dependencies are locked. On a cluster, run installation, preparation and computation in allocated jobs. Site settings and scheduler adapters stay outside this repository.
-
-All three model families use a project HDF5 reader that loads only the required image frames. Primitive actions and conversion proprioception stay dense; clip selection, preprocessing and losses stay upstream's. No dataset conversion or extra loader setting is needed.
+Python 3.11/CUDA 12.8 dependencies are locked. On clusters, install and compute in allocated jobs. Commands find packaged configs independently of the working directory. All model families use a reader that loads only required image frames while preserving dense actions and conversion proprioception.
 
 ## Download → train → evaluate
 
-This example uses the released Two-Room data. `TASK` can also be `pusht`, `cube` or `pointmaze`:
+For `tworoom`, `pusht`, `cube` or `pointmaze`:
 
 ```bash
 TASK=tworoom
-MODEL=fourier
+MODEL=fourier  # Also lewm or dinowm
 RUN="${TASK}_${MODEL}_s42"
-
-fourier-wm prepare-data --environment "$TASK" --download \
-  --output "$FOURIER_DATA/$TASK"
-
-fourier-wm train --environment "$TASK" model_family="$MODEL" \
-  seed=42 run_name="$RUN" dataset.manifest="$FOURIER_DATA/$TASK/train.json"
-
+fourier-wm prepare-data --environment "$TASK" --download --output "$FOURIER_DATA/$TASK"
+fourier-wm train --environment "$TASK" model_family="$MODEL" seed=42 \
+  run_name="$RUN" dataset.manifest="$FOURIER_DATA/$TASK/train.json"
 fourier-wm eval --environment "$TASK" seed=42 run_name="${RUN}_cem" \
-  checkpoint="$FOURIER_RUNS/$RUN/weights.pt" \
-  dataset.manifest="$FOURIER_DATA/$TASK/train.json"
+  checkpoint="$FOURIER_RUNS/$RUN/weights.pt" dataset.manifest="$FOURIER_DATA/$TASK/train.json"
 ```
 
-**For PointMaze evaluation, use `validation.json` instead of `train.json`.** Its official navigate release has 1,000 training and 100 validation episodes. Downloading preserves both original NPZs; preparation renders their recorded states without stepping physics. Use `--resume-data` to continue an existing image export. `--episodes 1` prepares a limited smoke export; full-data training rejects it.
+**PointMaze evaluates on `validation.json`.** Its official navigate release has 1,000 training and 100 validation episodes; preparation renders recorded states without stepping physics. Keep the original NPZs. `--resume-data` resumes an interrupted export; `--episodes 1` makes a smoke export that full training rejects.
 
-For upstream baselines, select `MODEL=lewm` or `dinowm`; for Fourier ablations, add `dynamics_type=linear` or `bilinear`. Use separate run names for training seeds 42, 43 and 44. Keep evaluation seed 42 and share the first evaluation's `tasks.json` across models/seeds using `tasks=/absolute/path/to/tasks.json`.
+Train seeds 42, 43 and 44 with separate run names. Evaluation uses seed 42 and the same saved `tasks.json` for all models/seeds: pass `tasks=/absolute/path/to/tasks.json`. Fourier linear/bilinear ablations add `dynamics_type=linear` or `bilinear`.
 
-For **Scene**, use `prepare-data --environment scene --download --output "$FOURIER_DATA/scene"`.
-This pins the released SWM Lance files (37.65 GB), preserves the originals and makes metadata-only
-90/5/5 episode views with split seed 42. Train with `--environment scene`
-and both `dataset.manifest="$FOURIER_DATA/scene/train.json"`
-and `dataset.validation_manifest="$FOURIER_DATA/scene/validation.json"`;
-evaluate with `dataset.manifest="$FOURIER_DATA/scene/test.json"`.
-All three families use image observations and native action channels (converted to rates only for Fourier).
-Task labels and privileged reset fields never enter the model. The original `raw/` directory must remain
-beside the views: they reference its image fragments. Scene is a project benchmark with native all-object
-success (cube, buttons, drawer and window), not a Table 1 reproduction or the OGBench RL leaderboard protocol.
+Use `train ... --dry-run` to inspect the resolved recipe, `--export-config /path/experiment.yaml` to save it and `--train-option key=value` for explicit source overrides. Paper profiles reject incompatible changes; label alternative protocols as project benchmarks.
 
-Downloads verify pinned SHA-256 hashes, resume partial HTTP transfers and publish completed files atomically. `progress.json` records download/render ETA. Existing unverified files are rejected. To import an existing author release, use `prepare-data --source /data/file.h5 --archive /data/original.tar.zst --output /data/train.json --split train`. Custom tasks use `--collect --source /data/train.h5 --output /data/train.json`; these are project benchmarks.
+Downloads resume partial transfers, verify pinned SHA-256 hashes and publish atomically. Progress JSONs record ETA. Existing unverified files are rejected. Existing author files can be imported with `prepare-data --source /data/file.h5 --archive /data/original.tar.zst --output /data/train.json --split train`; seeded custom collections use `--collect --source /data/train.h5 --output /data/train.json`.
 
-## Environment settings
+## Benchmarks and controls
 
-There is **one** config directory: [`src/fourier/configs/`](src/fourier/configs). Its [`env/`](src/fourier/configs/env) files contain each environment's physics, action semantics, rendering and dataset provenance. `benchmarks.yaml` contains shared paper profiles, planners and evaluation protocols; `experiment.yaml` contains run settings. `model/` and `train/` adapt the original SWM model/training configs. Commands discover these files independently of the working directory.
+The priority is **SWM > LeWM > DINO-WM** for an exact published setup. Each [`env/`](src/fourier/configs/env) file records physics, action units, rendering and provenance; [`benchmarks.yaml`](src/fourier/configs/benchmarks.yaml) records shared training/evaluation profiles.
 
-| Environment | Data/protocol authority | Training context: LeWM / Fourier | Native command → Fourier input |
+| Environment | Protocol authority | Images: LeWM / Fourier | Native command → Fourier input |
 |---|---|---|---|
-| [Push-T](src/fourier/configs/env/pusht.yaml) | SWM Table 1; author expert release | 3 / 1 image | Relative XY → pixel/s |
-| [Cube](src/fourier/configs/env/cube.yaml) | SWM Table 1; **LeWM-collected expert release**, not OGBench play | 3 / 1 image | XYZ, yaw, gripper displacement → separate rates |
-| [Two-Room](src/fourier/configs/env/tworoom.yaml) | LeWM; author heuristic release | 1 / 1 image | Relative XY ×5 per 0.1s → pixel/s |
-| [OGBench PointMaze](src/fourier/configs/env/pointmaze.yaml) | Official navigate release; project comparison | 3 / 1 image | Displacement ×0.2 per 0.1s → rate |
-| [Rope](src/fourier/configs/env/rope.yaml), [Granular](src/fourier/configs/env/granular.yaml) | DINO-WM release; project baseline adaptation | 1 / dense-motion replay required | Complete push endpoints; **not primitive velocity** |
-| [Scene](src/fourier/configs/env/scene.yaml) | SWM released visual data; project episode-holdout comparison | 3 / 1 image | XYZ, yaw, gripper displacement → separate rates |
-| Fetch, SimplePointMaze | Explicit seeded project collections | 3 / 1 image | Native displacement → configured rates |
+| Push-T | SWM Table 1; expert release | 3 / 1 | Relative XY → pixel/s |
+| Cube | SWM Table 1; **LeWM-collected expert release**, not OGBench play | 3 / 1 | XYZ, yaw, gripper displacement → separate rates |
+| Two-Room | LeWM heuristic release | 1 / 1 | Relative XY ×5 per 0.1s → pixel/s |
+| OGBench PointMaze | Official navigate release; project comparison | 3 / 1 | Displacement ×0.2 per 0.1s → rate |
+| Scene | SWM visual release; project episode holdout | 3 / 1 | XYZ, yaw, gripper displacement → separate rates |
+| Rope / Granular | DINO-WM release; project baseline adaptation | 1 / not ready | Complete push endpoints; Fourier needs dense-motion replay |
+| Fetch / SimplePointMaze | Explicit seeded project collections | 3 / 1 | Native displacement → configured rates |
 
-The priority is **SWM > LeWM > DINO-WM** for the exact published benchmark. Push-T/Cube paper CEM uses 50 tasks, goal offset 25, budget 50, horizon/replanning 25, and 300 candidates / 30 elites / 30 iterations. Two-Room uses 10 CEM iterations. LeWM-authority training uses 10 epochs; project defaults also use 10. DINO-WM retains its own backbone, action encoder and source optimizer. Paper-labeled DINO-WM retraining with unresolved source/paper conflicts fails explicitly; an alternative requires a project label.
+Push-T/Cube paper CEM uses 50 tasks, goal offset 25, budget 50, horizon/replanning 25 and 300 candidates / 30 elites / 30 iterations. Two-Room uses 10 CEM iterations. These settings are not defaults for unrelated tasks. LeWM-authority and project training budgets are 10 epochs; DINO-WM retains its backbone, action encoder and source optimizer. Unresolved paper/source conflicts reject paper-labeled DINO-WM retraining.
 
-LeWM encodes frames separately before its temporal predictor. Fourier rate-input dynamics use the current frame's latent. Force/torque inputs retain native units and require causal adjacent image history; the optional DINO force-maze path is experimental and needs `scripts/install-legacy-maze.sh`. It is separate from OGBench PointMaze and is not a current campaign target.
+LeWM encodes history images separately. Fourier rate-input dynamics use the current image. Native force/torque inputs require causal adjacent image latents, not block-spaced history or conversion to velocity. The experimental DINO force-maze path (`scripts/install-legacy-maze.sh`) is separate from OGBench and outside the current campaign.
 
-Use `fourier-wm train ... --dry-run` to inspect the exact resolved source recipe before training. `--train-option key=value` overrides source settings; paper profiles reject incompatible overrides. `--export-config /path/experiment.yaml` saves the resolved experiment. Layout, clipping, normalization or task changes must be reported rather than silently called the same benchmark.
+**Existing weights:** Two-Room clips supervise one pair `E(o_t) → five Fourier transitions → E(o_(t+5))`, with MSE + 0.09 SIGReg. Gradients flow through the encoder and all five transitions. Push-T/Cube supervise three teacher-forced five-step pairs through observation 15; this is not one uninterrupted 15-step rollout. Preserve these distinctions when sharing results.
 
-## Rope and Granular imports
+## Scene, Rope and Granular
 
-Both tasks share one pinned split ZIP release (about 16 GB). Install the `zip` command, then prepare either or both:
+All use the same CLI; train with both `dataset.manifest=.../train.json` and `dataset.validation_manifest=.../validation.json`.
+
+| Task | Preparation output | Training / evaluation split | Readiness |
+|---|---|---|---|
+| Scene | `prepare-data --environment scene --download --output "$FOURIER_DATA/scene"` | 90/5/5% episodes; evaluate `test.json` | Three model families; native all-object success |
+| Rope | `prepare-data --environment rope --download --output "$FOURIER_DATA/deformable"` | 900/100 episodes; evaluate `rope/validation.json` | LeWM/DINO-WM offline training; PyFlex evaluation needs runtime validation |
+| Granular | Same command with `--environment granular` | 900/100 episodes; evaluate `granular/validation.json` | Same limits as Rope |
+
+Scene pins the 37.65 GB SWM Lance release. Keep its original `raw/` directory beside metadata-only split views. All models receive images; privileged reset/task fields do not enter the model. This is a project benchmark, not Table 1 or the OGBench RL leaderboard.
+
+Rope/Granular share one 16 GB split ZIP; install `zip` and leave roughly 50 GB free for both imports. The second command reuses the download. `--source /data/raw_parts` imports existing parts, and `--resume-data` continues conversion. The importer selectively reads source tensors and preserves RGB, native controls and particle states. It uses the source seed-42 episode split; no separate released test split exists. Particle states are reset/metric data only.
+
+For example, train a Rope baseline with:
 
 ```bash
-fourier-wm prepare-data --environment rope --download --output "$FOURIER_DATA/deformable"
-fourier-wm prepare-data --environment granular --download --output "$FOURIER_DATA/deformable"
+fourier-wm train --environment rope model_family=lewm seed=42 run_name=rope_lewm_s42 \
+  dataset.manifest="$FOURIER_DATA/deformable/rope/train.json" \
+  dataset.validation_manifest="$FOURIER_DATA/deformable/rope/validation.json"
 ```
 
-The second command reuses the verified download. Existing parts can be supplied with `--source /data/raw_parts` instead of `--download`. Each task produces `rope/` or `granular/` with `train.h5`, `validation.h5`, manifests and conversion progress. Add `--resume-data` after an interrupted conversion. Leave roughly 50 GB free for original parts, the joined archive, source tensors and both converted tasks. Only declared tensor members are read; the archive is never unpacked wholesale.
+**A deformable action executes a complete variable-duration push** `[start_x,start_z,end_x,end_z]`. Fourier training/SQP/TV-LQR reject these controls. Dense commanded tool motion, timing and intermediate observations must be replayed and validated first; subtracting endpoints loses contact location. Do not queue Fourier on this endpoint release.
 
-Imports preserve the released 1,000 × 20 observation/action records per task, integer RGB values, native four-coordinate push actions, particle states and dummy proprioception. The source `torch.randperm(seed=42)` split holds out 100 complete episodes; there is no separate released test split. Particle states are reset/metric data, excluded from model observations. The unchanged SWM reader loads the HDF5s directly. LeWM/DINO-WM training adapters use one-image context, frameskip one, external validation and a project label; this does not claim exact paper reproduction.
+Optional baseline CEM uses DINO-WM PyFlex commit `0a9492fa12044b852ae9e001cc74604b79c8bb0c`, selected through `DINO_WM_ROOT` and installed separately. One environment per process is supported. Native replay and GPU compatibility must pass before evaluation. The project protocol uses five complete pushes, replanning after each, and LaLa-World Chamfer thresholds; its task sampler and results are not interchangeable with published success rates. `doctor --environment rope` reports these limits.
 
-**One transition executes an entire variable-duration push** `[start_x,start_z,end_x,end_z]`. Fourier training/SQP/TV-LQR reject these endpoint actions. Dense images, commanded tool motion and timing must be replayed and validated before training our primitive-rate dynamics. Subtracting endpoints loses the push's contact location and is insufficient.
-
-Optional baseline CEM execution uses the DINO-WM PyFlex backend at commit `0a9492fa12044b852ae9e001cc74604b79c8bb0c`, selected by `DINO_WM_ROOT`. Follow that project's optional deformable-runtime installation separately; data import needs no PyFlex, Gym or PyBullet installation. The bridge requires one environment per process. Real PyFlex replay and B200/MIG compatibility must pass on allocated hardware before launching evaluations. The default is a **project** held-out dataset-goal protocol with five complete pushes, replanning after each; Chamfer thresholds come from LaLa-World, whose task sampler and published rates are not interchangeable with this protocol. `doctor --environment rope` reports these boundaries.
-
-## Test shared weights
+## Share weights and run MPC
 
 Keep `weights.pt`, `config.json` and `training_metadata.json` together:
 
@@ -102,31 +106,22 @@ python scripts/demo_tworoom.py --checkpoint /shared/tworoom_fourier_s42/weights.
   --output "$FOURIER_RUNS/tworoom_demo"
 ```
 
-The dataset-free demo saves a GIF with current observation left and goal right. Add `--planner sqp --feedback` and choose a new output directory to try eight-start Gauss–Newton with TV-LQR. It is one native seeded task, not a paper success-rate evaluation.
-
-For exact saved-task replay, copy the handoff's original `dataset/train.json`, change **only its `path`** to your local HDF5, and pass the handoff's `evaluation/tasks.json` to `eval`. Schema-v2 identity excludes the file locator; data hashes remain verified. Recreating a manifest may change its provenance identity. Fourier always uses saved training normalization, never statistics refitted on test data.
-
-**Existing Two-Room weights:** each clip supervises `E(o_t) → five Fourier transitions → E(o_(t+5))`, with endpoint MSE + 0.09 SIGReg. Gradients flow through all five steps and the encoder. These weights/current Two-Room profile use one pair per clip, not the requested three pairs through step 15. Push-T/Cube use three teacher-forced five-step pairs; this is not an uninterrupted fifteen-step rollout. Do not relabel existing experiments.
-
-## Closed-loop control
+The dataset-free demo saves a current-observation/goal GIF. Add `--planner sqp --feedback` for eight-start Gauss–Newton with TV-LQR; one demo is not a paper evaluation. For exact replay, copy the original manifest, change only its `path`, and reuse the original task list. Fourier loads saved training normalization and never refits it on evaluation data.
 
 ```bash
 fourier-wm eval --environment tworoom protocol=closed_loop planner=sqp \
-  seed=42 run_name=tworoom_gn_tvlqr \
-  checkpoint=/shared/tworoom_fourier_s42/weights.pt dataset.manifest=/data/tworoom/train.json \
-  tasks=/shared/tworoom_fourier_s42/evaluation/tasks.json \
+  seed=42 run_name=tworoom_gn_tvlqr checkpoint=/shared/tworoom_fourier_s42/weights.pt \
+  dataset.manifest=/data/tworoom/train.json tasks=/shared/evaluation/tasks.json \
   protocol.num_eval=50 planner.starts=8 protocol.replan_steps=5 protocol.feedback=true \
   protocol.horizon_schedule=deadline
 ```
 
-`sqp` is the compatibility name for projected Gauss–Newton. TV-LQR is a separate correction at every observation. `deadline` uses horizons 25,20,15,10,5 between 25-step deadlines. For a matched project CEM comparison, use `planner=cem`, omit `planner.starts`, and disable feedback. Paper CEM preserves upstream execution; project MPC clips executed actions, and Gauss–Newton also projects its search. Report the distinction.
+`sqp` names projected Gauss–Newton for compatibility. TV-LQR corrects each observation separately. `deadline` shrinks horizons 25,20,15,10,5 between deadlines. Project CEM uses `planner=cem`, no `planner.starts` and feedback disabled. Project execution clips actions; Gauss–Newton also projects its search. Paper CEM preserves upstream behavior.
 
-For longer PointMaze tasks, select `protocol=closed_loop`, set `protocol.goal_offset=50 protocol.horizon_steps=50 protocol.budget=100`, and use a shared validation task list. For 75 steps, use offset/horizon 75 and budget 150. History-state Fourier checkpoints currently support CEM only; single-state SQP/TV-LQR cannot substitute.
+Long PointMaze tasks use `protocol=closed_loop protocol.goal_offset=50 protocol.horizon_steps=50 protocol.budget=100` with shared validation tasks. Use 75/75/150 for longer goals. History-state Fourier checkpoints support CEM only; single-state SQP/TV-LQR cannot substitute.
 
 ## Outputs and recovery
 
-Each run has immutable config/provenance, dataset and normalization identities, metrics, checkpoints and evaluation records. Output directories cannot be reused accidentally. Send `SIGUSR1` to checkpoint and exit; resume the same source/config with `resume_from=/runs/name/resume/last.ckpt`. Code/config mismatches are rejected. Existing PARCC snapshots stay frozen for exact resume; a cleaned checkout is not silently substituted.
+Runs save immutable config/provenance, data/normalization identities, metrics, weights, recovery checkpoints and evaluation records. Names cannot collide. `SIGUSR1` saves and exits; resume with `resume_from=/runs/name/resume/last.ckpt` under the original source/config. Incompatible resumes are rejected.
 
-`fourier-wm summarize` reads saved results. Videos are optional with `output.save_video=true`. `submit` uses an externally installed site adapter. Tests are a separately versioned package; [VALIDATION.json](VALIDATION.json) records checks and remaining limits. Full benchmark success is not established by smoke tests.
-
-Project code lives only in `src/fourier/`; `scripts/` contains installation and the small weight demo. `stable-worldmodel/` retains the exact upstream tree and licensing from `UPSTREAM.json`. Data, weights, generated results and cluster operations stay outside Git.
+`fourier-wm summarize` reads saved results. Videos are optional (`output.save_video=true`); `submit` uses an external site adapter. [VALIDATION.json](VALIDATION.json) records the separately versioned checks and remaining limits. Passing pipeline checks does not establish benchmark success.
