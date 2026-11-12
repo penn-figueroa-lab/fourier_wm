@@ -33,6 +33,9 @@ def main(argv=None):
     )
     parser.add_argument("--episodes", type=int)
     parser.add_argument(
+        "--parent-budget", type=int, help="Maximum source parents in one dense replay job"
+    )
+    parser.add_argument(
         "--resume-data",
         action="store_true",
         help="Resume an interrupted dataset conversion at its last complete episode",
@@ -82,6 +85,7 @@ def main(argv=None):
             "expected_sha256",
             "split",
             "episodes",
+            "parent_budget",
             "catalog",
             "archive",
         ):
@@ -153,6 +157,27 @@ def main(argv=None):
         if not args.source or not args.output:
             parser.error("prepare-data requires --source and --output")
         env = OmegaConf.to_container(cfg.environment, resolve=True)
+        if env["family"] == "deformable_dense":
+            if not args.collect or args.catalog not in {None, "custom"}:
+                parser.error(
+                    "Dense PyFlex replay requires --collect and the verified native data root in --source"
+                )
+            from .dense_deformable import prepare_dense
+
+            print(
+                json.dumps(
+                    prepare_dense(
+                        args.source,
+                        args.output,
+                        env,
+                        resume=args.resume_data,
+                        limit=args.episodes,
+                        parent_budget=args.parent_budget,
+                    ),
+                    indent=2,
+                )
+            )
+            return
         if env["family"] == "deformable":
             if (
                 args.collect

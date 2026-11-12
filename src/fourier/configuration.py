@@ -157,6 +157,29 @@ def training_config(experiment):
             raise ValueError(
                 "DINO-WM Maze requires the original1800/200 episode split and its validation manifest"
             )
+    if environment["family"] == "deformable_dense":
+        from .dense_deformable import validate_dense_manifest
+
+        if not experiment.dataset.validation_manifest or experiment.dataset.frameskip != 5:
+            raise ValueError(
+                "Dense deformable comparison requires external validation and five primitive steps per block"
+            )
+        smoke_steps = [
+            int(str(x).split("=", 1)[1])
+            for x in experiment.training_overrides
+            if str(x).lstrip("+").split("=", 1)[0] == "trainer.max_steps"
+        ]
+        smoke = (
+            experiment.dataset.regime == "project_smoke"
+            and str(experiment.run_name).endswith("_smoke")
+            and len(smoke_steps) == 1
+            and 0 < smoke_steps[0] <= 3
+        )
+        validate_dense_manifest(manifest, allow_limited=smoke)
+        validation = read_manifest(experiment.dataset.validation_manifest)
+        validate_dense_manifest(validation, allow_limited=smoke)
+        if manifest["origin"]["sha256"] != validation["origin"]["sha256"]:
+            raise ValueError("Dense train/validation must come from the same complete replay")
     profile = experiment.get("training_profile", "source")
     if profile not in {"swm_paper", "lewm_paper", "dinowm_paper", "source", "project"}:
         raise ValueError("Choose an authority's paper profile, source, or project")

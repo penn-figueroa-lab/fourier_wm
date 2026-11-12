@@ -213,6 +213,16 @@ def prepare_manifest(
             "split_policy",
             "fixed disjoint episode holdout: 90% train, 5% validation, 5% test; no image/action rewrite",
         )
+    if origin and origin.get("format") == "deformable_dense":
+        result["collection_settings"] = {
+            "kind": "project_dense_replay",
+            **environment["collection"],
+        }
+        result["split_policy"] = (
+            "Original parent-episode holdout; derived windows never cross splits"
+        )
+        result["image_preprocessing"]["source_images_preserved"] = False
+        result["image_preprocessing"]["rendered_from_physics"] = True
     result["identity"] = fingerprint({k: v for k, v in result.items() if k != "path"})
     output = Path(output)
     if output.exists():
@@ -246,6 +256,9 @@ def read_manifest(path, *, verify=True):
                 value["episodes"],
                 base=Path(value["path"]).parent,
             )
+        elif origin.get("format") == "deformable_dense":
+            if file_hash(Path(value["path"]).parent / origin["path"]) != origin["sha256"]:
+                raise ValueError("Dense replay receipt differs from its manifest")
         elif tree_hash(origin["path"]) != origin["sha256"]:
             raise ValueError("Lance view source content differs from its pinned release")
     return value

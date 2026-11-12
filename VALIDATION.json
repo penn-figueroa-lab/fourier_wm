@@ -11,7 +11,7 @@
   },
   "configuration": {
     "canonical_location": "src/fourier/configs",
-    "environment_files": 13,
+    "environment_files": 15,
     "project_docs_consolidated_into_readme": true,
     "root_config_alias_removed": true,
     "resolved_configurations_compared": 66,
@@ -100,8 +100,8 @@
       "scope": "One-episode official-release smoke export, warm local cache, RTX3090Ti, optimizer lr=0, no Lightning/checkpoint overhead; concurrent local work possible. Not a PARCC or full-campaign speed claim."
     }
   },
-  "previous_source_code_sha256": "7d8364eb606666835e57e91e19c7a1d6da8d359479a21f6d07b4e5de715f4bdb",
-  "source_code_sha256": "46ee3067cbe1ff47c734b32c612c121aeb48814e4b6e1c8e7106a8f3d5752c09",
+  "previous_source_code_sha256": "46ee3067cbe1ff47c734b32c612c121aeb48814e4b6e1c8e7106a8f3d5752c09",
+  "source_code_sha256": "da05361c65be521f9bfcc627da8c4a7b324a126482ba29a0037602dff5142d97",
   "scene": {
     "external_checks": 7,
     "regression_checks": 41,
@@ -140,21 +140,16 @@
   },
   "validation": {
     "package": "fourier-wm-validation",
-    "version": "0.9.6",
-    "revision": "a2bade43cdd4483e5dc8e90c90b2376ff02f5178",
-    "wheel": "fourier_wm_validation-0.9.6-py3-none-any.whl",
-    "wheel_sha256": "4e6adcc9054b3d5877f435145cace7f4cd07d80a1c1f1597e58cee024ac11335",
+    "version": "0.9.7",
+    "revision": "ef9aafa91b4ef2ed179d86b50fa19d7e3fc22bee",
+    "wheel": "fourier_wm_validation-0.9.7-py3-none-any.whl",
+    "wheel_sha256": "ed58d3665ed3deec2ffb5a663448cb6c7b8d810e455162cb0e08126b2ffaffbd",
     "local_focused_suite": {
-      "passed": 27,
+      "passed": 41,
       "failed": 0,
-      "scope": "Original import, data-worker, portability, interrupted conversion and truncated HTTP recovery checks"
+      "scope": "Dense causal commands, replay storage/recovery, native import, loader/training parity and exact interrupted training recovery"
     },
-    "previous_snapshot_parcc_checks": {
-      "passed": 42,
-      "job": "10499833",
-      "source_code_sha256": "7d8364eb606666835e57e91e19c7a1d6da8d359479a21f6d07b4e5de715f4bdb"
-    },
-    "final_parcc_checks": "pending allocated check of the HTTP recovery update"
+    "parcc_dense_native_gpu": "pending allocated preflight"
   },
   "deformable": {
     "scope": "Released Rope/Granular import and optional native-push baseline bridge; not primitive-rate Fourier training",
@@ -169,8 +164,8 @@
       2
     ],
     "data_move_preserves_identity": true,
-    "full_release_import": "pending download completion",
-    "native_pyflex_replay": "not validated; separate optional runtime required",
+    "full_release_import": "complete; source values verified locally and on PARCC",
+    "native_pyflex_replay": "local Rope and Granular dense replay passed on RTX3090Ti; allocated B200 check pending",
     "b200_mig_pyflex_compatibility": "not validated",
     "old_configuration_parity": {
       "configurations": 66,
@@ -190,5 +185,42 @@
       "complete_digest_still_required": true,
       "local_import_and_download_checks": 27
     }
+  },
+  "dense_deformable": {
+    "scope": "New matched primitive-step project benchmark; not native whole-push published results",
+    "dt_seconds": 0.016666666666666666,
+    "source_parents": {
+      "train": 900,
+      "validation": 100
+    },
+    "window_frames": 101,
+    "models": [
+      "fourier",
+      "lewm",
+      "dinowm"
+    ],
+    "training_seeds": [
+      42,
+      43,
+      44
+    ],
+    "epochs": 10,
+    "local_real_data_learning_and_reload_resume": {
+      "models": 3,
+      "steps_each": 2,
+      "passed": true
+    },
+    "focused_local_checks": {
+      "passed": 41,
+      "failed": 0,
+      "scope": "Causal commanded actions, replay storage/recovery, source import, loader parity and exact interrupted training recovery"
+    },
+    "parcc_runtime_cpu_install": {
+      "job": "10504669",
+      "passed": true
+    },
+    "parcc_native_gpu_check": "pending allocation",
+    "complete_dense_exports": "pending allocated replay",
+    "primitive_closed_loop_evaluation": "not implemented; explicit error"
   }
 }

@@ -23,6 +23,10 @@ def button_state(row, index):
 
 
 def make_env(spec, budget):
+    if spec["family"] == "deformable_dense":
+        raise NotImplementedError(
+            "Primitive PyFlex data/training is supported; closed-loop evaluation requires the separately validated primitive simulator bridge"
+        )
     if spec["family"] == "deformable":
         from .deformable_env import DeformableEnv
 

@@ -61,7 +61,7 @@ The priority is **SWM > LeWM > DINO-WM** for an exact published setup. Each [`en
 | Two-Room | LeWM heuristic release | 1 / 1 | Relative XY ×5 per 0.1s → pixel/s |
 | OGBench PointMaze | Official navigate release; project comparison | 3 / 1 | Displacement ×0.2 per 0.1s → rate |
 | Scene | SWM visual release; project episode holdout | 3 / 1 | XYZ, yaw, gripper displacement → separate rates |
-| Rope / Granular | DINO-WM release; project baseline adaptation | 1 / not ready | Complete push endpoints; Fourier needs dense-motion replay |
+| Rope / Granular dense | Matched primitive replay; project benchmark | 3 / 1 | Causal XYZ target displacement per 1/60s → rates |
 | Fetch / SimplePointMaze | Explicit seeded project collections | 3 / 1 | Native displacement → configured rates |
 
 Push-T/Cube paper CEM uses 50 tasks, goal offset 25, budget 50, horizon/replanning 25 and 300 candidates / 30 elites / 30 iterations. Two-Room uses 10 CEM iterations. These settings are not defaults for unrelated tasks. LeWM-authority and project training budgets are 10 epochs; DINO-WM retains its backbone, action encoder and source optimizer. Unresolved paper/source conflicts reject paper-labeled DINO-WM retraining.
@@ -72,29 +72,26 @@ LeWM encodes history images separately. Fourier rate-input dynamics use the curr
 
 ## Scene, Rope and Granular
 
-All use the same CLI; train with both `dataset.manifest=.../train.json` and `dataset.validation_manifest=.../validation.json`.
+Scene uses `prepare-data --environment scene --download --output "$FOURIER_DATA/scene"`; train with both `dataset.manifest=.../train.json` and `dataset.validation_manifest=.../validation.json`. Its episode split is 90/5/5%; evaluate on `test.json`.
 
-| Task | Preparation output | Training / evaluation split | Readiness |
-|---|---|---|---|
-| Scene | `prepare-data --environment scene --download --output "$FOURIER_DATA/scene"` | 90/5/5% episodes; evaluate `test.json` | Three model families; native all-object success |
-| Rope | `prepare-data --environment rope --download --output "$FOURIER_DATA/deformable"` | 900/100 episodes; evaluate `rope/validation.json` | LeWM/DINO-WM offline training; PyFlex evaluation needs runtime validation |
-| Granular | Same command with `--environment granular` | 900/100 episodes; evaluate `granular/validation.json` | Same limits as Rope |
-
-Scene pins the 37.65 GB SWM Lance release. Keep its original `raw/` directory beside metadata-only split views. All models receive images; privileged reset/task fields do not enter the model. This is a project benchmark, not Table 1 or the OGBench RL leaderboard.
-
-Rope/Granular share one 16 GB split ZIP; install `zip` and leave roughly 50 GB free for both imports. The second command reuses the download. `--source /data/raw_parts` imports existing parts, and `--resume-data` continues conversion. The importer selectively reads source tensors and preserves RGB, native controls and particle states. It uses the source seed-42 episode split; no separate released test split exists. Particle states are reset/metric data only.
-
-For example, train a Rope baseline with:
+The native Rope/Granular release contains **whole pushes**, not primitive velocity commands. Keep it as replay input; do not train Fourier on endpoint differences. For the matched project benchmark, install the pinned PyFlex runtime separately and set `FOURIER_PYFLEX_RUNTIME` to its directory (verified `runtime.json`, native libraries and isolated `.venv`). Then:
 
 ```bash
-fourier-wm train --environment rope model_family=lewm seed=42 run_name=rope_lewm_s42 \
-  dataset.manifest="$FOURIER_DATA/deformable/rope/train.json" \
-  dataset.validation_manifest="$FOURIER_DATA/deformable/rope/validation.json"
+TASK=rope  # Or granular
+fourier-wm prepare-data --environment "$TASK" --download --output "$FOURIER_DATA/deformable"
+fourier-wm prepare-data --environment "${TASK}_dense" --collect \
+  --source "$FOURIER_DATA/deformable" --output "$FOURIER_DATA/dense"
+fourier-wm train --environment "${TASK}_dense" model_family=fourier seed=42 \
+  run_name="${TASK}_dense_fourier_s42" \
+  dataset.manifest="$FOURIER_DATA/dense/${TASK}_dense/train.json" \
+  dataset.validation_manifest="$FOURIER_DATA/dense/${TASK}_dense/validation.json"
 ```
 
-**A deformable action executes a complete variable-duration push** `[start_x,start_z,end_x,end_z]`. Fourier training/SQP/TV-LQR reject these controls. Dense commanded tool motion, timing and intermediate observations must be replayed and validated first; subtracting endpoints loses contact location. Do not queue Fourier on this endpoint release.
+Repeat with `model_family=lewm|dinowm` and seeds 42–44. All three models use the same RGB frames and 900/100 disjoint source-parent split. Each source push contributes one seeded 101-frame window where commands satisfy the declared bounds. Baselines encode native commanded displacements; Fourier converts them to rates **before** normalization/blocking and supervises three teacher-forced five-step endpoints with MSE + 0.09 SIGReg. Reset-only particle/robot states are excluded from model inputs.
 
-Optional baseline CEM uses DINO-WM PyFlex commit `0a9492fa12044b852ae9e001cc74604b79c8bb0c`, selected through `DINO_WM_ROOT` and installed separately. One environment per process is supported. Native replay and GPU compatibility must pass before evaluation. The project protocol uses five complete pushes, replanning after each, and LaLa-World Chamfer thresholds; its task sampler and results are not interchangeable with published success rates. `doctor --environment rope` reports these limits.
+`--resume-data` preserves committed source parents; `--parent-budget 100` completes a bounded preparation job without publishing partial data as ready. `--episodes 1` makes a limited local check, rejected by full training. Replay records source/runtime checksums, causal target commands, rejected windows and physical timing; it never estimates commands from future observed motion.
+
+These are new primitive-step benchmarks, **not published DINO-WM success rates**. Native CPU import, GPU physics/rendering, complete exports and bounded learning/recovery must pass before full training. Primitive closed-loop PyFlex execution is not validated yet: evaluation fails explicitly until its simulator bridge and task metrics are implemented. Native endpoint baselines/evaluation remain available separately as `rope` and `granular`; their variable-duration pushes and thresholds do not transfer to the dense benchmark.
 
 ## Share weights and run MPC
 
