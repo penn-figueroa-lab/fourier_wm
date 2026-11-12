@@ -100,8 +100,8 @@
       "scope": "One-episode official-release smoke export, warm local cache, RTX3090Ti, optimizer lr=0, no Lightning/checkpoint overhead; concurrent local work possible. Not a PARCC or full-campaign speed claim."
     }
   },
-  "previous_source_code_sha256": "1e060e806ac020a9455a9f4882c6e19ea6e9e3d3f7cd8e8df94d15530d6b5868",
-  "source_code_sha256": "7d8364eb606666835e57e91e19c7a1d6da8d359479a21f6d07b4e5de715f4bdb",
+  "previous_source_code_sha256": "7d8364eb606666835e57e91e19c7a1d6da8d359479a21f6d07b4e5de715f4bdb",
+  "source_code_sha256": "46ee3067cbe1ff47c734b32c612c121aeb48814e4b6e1c8e7106a8f3d5752c09",
   "scene": {
     "external_checks": 7,
     "regression_checks": 41,
@@ -118,18 +118,6 @@
     "scope": "Scene project benchmark only; earlier complete-suite results apply to previous_source_code_sha256"
   },
   "previous_validation": {
-    "package": "fourier-wm-validation",
-    "version": "0.9.4",
-    "revision": "90b22906fc5b64d512d71549d40455bb80dda020",
-    "wheel": "fourier_wm_validation-0.9.4-py3-none-any.whl",
-    "wheel_sha256": "f549c841d852579c44d7b6fe12b760fd374a4e72e33592a7c64dd615555f27c4",
-    "focused_suite": {
-      "passed": 48,
-      "failed": 0,
-      "scope": "Scene plus download, protocol and release regressions; previous full-suite record retained separately"
-    }
-  },
-  "validation": {
     "package": "fourier-wm-validation",
     "version": "0.9.5",
     "revision": "8d75ed53c81eaa99f4a717bc230fba6256f3c4fc",
@@ -149,6 +137,24 @@
       },
       "scope": "Broad regression suite plus focused reruns; full current suite to be checked in allocated PARCC job"
     }
+  },
+  "validation": {
+    "package": "fourier-wm-validation",
+    "version": "0.9.6",
+    "revision": "a2bade43cdd4483e5dc8e90c90b2376ff02f5178",
+    "wheel": "fourier_wm_validation-0.9.6-py3-none-any.whl",
+    "wheel_sha256": "4e6adcc9054b3d5877f435145cace7f4cd07d80a1c1f1597e58cee024ac11335",
+    "local_focused_suite": {
+      "passed": 27,
+      "failed": 0,
+      "scope": "Original import, data-worker, portability, interrupted conversion and truncated HTTP recovery checks"
+    },
+    "previous_snapshot_parcc_checks": {
+      "passed": 42,
+      "job": "10499833",
+      "source_code_sha256": "7d8364eb606666835e57e91e19c7a1d6da8d359479a21f6d07b4e5de715f4bdb"
+    },
+    "final_parcc_checks": "pending allocated check of the HTTP recovery update"
   },
   "deformable": {
     "scope": "Released Rope/Granular import and optional native-push baseline bridge; not primitive-rate Fourier training",
@@ -176,6 +182,13 @@
       "manifest_tree": "b4ea0f6e08ddd22c2fc74344de2f5577b9f563ed",
       "changed": [],
       "checked_files": 357
+    },
+    "http_recovery": {
+      "premature_eof_keeps_partial": true,
+      "bounded_range_responses_supported": true,
+      "invalid_range_cannot_change_prefix": true,
+      "complete_digest_still_required": true,
+      "local_import_and_download_checks": 27
     }
   }
 }

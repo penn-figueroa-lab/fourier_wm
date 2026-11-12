@@ -3,6 +3,7 @@
 from contextlib import contextmanager
 import fcntl
 from pathlib import Path
+import re
 import shutil
 import sys
 import tarfile
@@ -44,16 +45,27 @@ def fetch(url, destination, sha256, *, attempts=3, progress=None):
             try:
                 with urlopen(request, timeout=60) as response:
                     resumed = response.status == 206
-                    if resumed and not response.headers.get("Content-Range", "").startswith(
-                        f"bytes {offset}-"
-                    ):
-                        raise ValueError("Server returned an incorrect HTTP range")
+                    length = response.headers.get("Content-Length")
+                    total = int(length) if length else None
+                    response_end = total
+                    if resumed:
+                        match = re.fullmatch(
+                            r"bytes (\d+)-(\d+)/(\d+)", response.headers.get("Content-Range", "")
+                        )
+                        if match is None:
+                            raise ValueError("Server returned an incorrect HTTP range")
+                        start, end, total = map(int, match.groups())
+                        if (
+                            start != offset
+                            or not start <= end < total
+                            or (length and int(length) != end - start + 1)
+                        ):
+                            raise ValueError("Server returned an incorrect HTTP range")
+                        response_end = end + 1
                     with partial.open("ab" if resumed else "wb") as output:
                         done = offset if resumed else 0
                         initial, started, last = done, time.monotonic(), 0.0
-                        length = response.headers.get("Content-Length")
-                        total = done + int(length) if length else None
-                        while block := response.read(8 << 20):
+                        while block := response.read(1 << 20):
                             output.write(block)
                             done += len(block)
                             elapsed = time.monotonic() - started
@@ -81,6 +93,15 @@ def fetch(url, destination, sha256, *, attempts=3, progress=None):
                                         flush=True,
                                     )
                                 last = time.monotonic()
+                    # HTTPResponse.read(size) can return EOF without raising
+                    # IncompleteRead. Keep the prefix for a ranged retry;
+                    # never mistake a truncated body for corrupt full data.
+                    if response_end is not None and done != response_end:
+                        raise OSError(
+                            f"HTTP body ended at {done}, expected {response_end}; partial retained"
+                        )
+                    if total is not None and done < total:
+                        raise OSError(f"HTTP range ended at {done} of {total}; partial retained")
                 if file_hash(partial) != sha256:
                     partial.unlink()
                     raise ValueError(f"Downloaded checksum differs from the pinned release: {url}")
