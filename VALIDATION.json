@@ -9,18 +9,6 @@
     "changed": [],
     "checked_files": 357
   },
-  "validation": {
-    "package": "fourier-wm-validation",
-    "version": "0.9.3",
-    "revision": "2da2fb452677e4458dc9dec1f68df4fcd2d83367",
-    "wheel": "fourier_wm_validation-0.9.3-py3-none-any.whl",
-    "wheel_sha256": "f5531fcf76ce41cace0ed4bf9e9ed20bcb69c9f8ac2fe234b8d3f081805b6ed1",
-    "final_suite": {
-      "passed": 164,
-      "failed": 0,
-      "seconds": 140.4
-    }
-  },
   "configuration": {
     "canonical_location": "src/fourier/configs",
     "environment_files": 11,
@@ -128,5 +116,29 @@
     "split_policy": "90/5/5 complete episodes, fixed seed42",
     "allocated_full_release_checks": "pending; mandatory before training",
     "scope": "Scene project benchmark only; earlier complete-suite results apply to previous_source_code_sha256"
+  },
+  "previous_validation": {
+    "package": "fourier-wm-validation",
+    "version": "0.9.3",
+    "revision": "2da2fb452677e4458dc9dec1f68df4fcd2d83367",
+    "wheel": "fourier_wm_validation-0.9.3-py3-none-any.whl",
+    "wheel_sha256": "f5531fcf76ce41cace0ed4bf9e9ed20bcb69c9f8ac2fe234b8d3f081805b6ed1",
+    "final_suite": {
+      "passed": 164,
+      "failed": 0,
+      "seconds": 140.4
+    }
+  },
+  "validation": {
+    "package": "fourier-wm-validation",
+    "version": "0.9.4",
+    "revision": "90b22906fc5b64d512d71549d40455bb80dda020",
+    "wheel": "fourier_wm_validation-0.9.4-py3-none-any.whl",
+    "wheel_sha256": "f549c841d852579c44d7b6fe12b760fd374a4e72e33592a7c64dd615555f27c4",
+    "focused_suite": {
+      "passed": 48,
+      "failed": 0,
+      "scope": "Scene plus download, protocol and release regressions; previous full-suite record retained separately"
+    }
   }
 }
