@@ -15,6 +15,13 @@ def row_value(row, key):
     raise KeyError(f"Dataset needs reset column {key!r}; refusing an approximate reset")
 
 
+def button_state(row, index):
+    value = row_value(row, f"privileged/button_{index}_state").item()
+    if value not in (0, 1):
+        raise ValueError("Scene button states must be binary")
+    return int(value)  # Author Lance release stores these discrete indices as float32.
+
+
 def make_env(spec, budget):
     if spec["family"] == "d4rl_maze":
         from .legacy_maze import make_env as legacy_env
@@ -82,6 +89,10 @@ def validate_action_semantics(env, spec):
             -np.asarray(action.scale), base.action_low
         ):
             raise ValueError("OGBench command channel scales mismatch")
+        if family == "scene" and (
+            not np.isclose(action.dt, base._control_timestep) or base._mode != "task"
+        ):
+            raise ValueError("Scene requires the configured control interval and all-object task success")
     elif family in {"tworoom", "simple_pointmaze"}:
         speed = np.asarray(base.variation_space["agent"]["speed"].value).item()
         if not np.allclose(action.scale, speed):
@@ -122,7 +133,7 @@ def restore(env, spec, start, goal, seed):
     elif family in {"cube", "scene"}:
         buttons = (
             {
-                f"button_state_{i}": row_value(start, f"privileged/button_{i}_state").item()
+                f"button_state_{i}": button_state(start, i)
                 for i in range(base._num_buttons)
             }
             if family == "scene"
@@ -138,9 +149,9 @@ def restore(env, spec, start, goal, seed):
             )
         if family == "scene":
             for i in range(base._num_buttons):
-                base._cur_button_states[i] = row_value(start, f"privileged/button_{i}_state").item()
+                base._cur_button_states[i] = button_state(start, i)
                 base.set_target_button_state(
-                    i, row_value(goal, f"privileged/button_{i}_state").item()
+                    i, button_state(goal, i)
                 )
             base._prev_button_states = base._cur_button_states.copy()
             base.set_target_drawer_pos(row_value(goal, "privileged/drawer_pos").item())

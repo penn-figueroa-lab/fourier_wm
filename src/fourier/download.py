@@ -1,4 +1,4 @@
-"""Explicit, checksum-pinned dataset downloads and atomic HDF5 extraction."""
+"""Checksum-pinned releases, atomic extraction and read-only Lance views."""
 
 from contextlib import contextmanager
 import fcntl
@@ -169,6 +169,10 @@ def _prepare_download(environment, output, *, catalog, split, resume, limit):
         return import_ogbench_pointmaze(output / "raw", output, resume=resume, limit=limit)
     entries = dataset_catalog()
     entry = entries.get(catalog, {})
+    if entry.get("format") == "lance" and entry.get("environment") == environment["name"]:
+        if limit is not None or split not in {None, "train"}:
+            raise ValueError("Lance releases prepare complete train/validation/test episode splits")
+        return prepare_lance(entry, environment, output, catalog)
     if not entry.get("unpacked") or entry.get("environment") != environment["name"]:
         raise ValueError(
             "No automatic release for this environment/catalog. Use explicit --source and provenance, or --collect for a project benchmark."
@@ -206,3 +210,71 @@ def _prepare_download(environment, output, *, catalog, split, resume, limit):
         archive=archive,
     )
     return {"manifest": str(manifest), "identity": value["identity"], "episodes": value["episodes"]}
+
+
+def prepare_lance(entry, environment, output, catalog):
+    """Preserve release bytes; shallow clones hold out episodes without image copies."""
+    import uuid
+    import lance
+    import numpy as np
+    from .data import prepare_manifest, read_manifest
+    from .runtime import tree_hash
+
+    raw = output / "raw" / entry["artifact"]
+    for name, digest in entry["files"].items():
+        destination = raw / name
+        fetch(
+            f"{entry['source']}/resolve/{entry['revision']}/{entry['artifact']}/{name}",
+            destination, digest, progress=output / "progress.json",
+        )
+        # Download locks are not part of the immutable author's dataset.
+        destination.with_name(destination.name + ".download.lock").unlink(missing_ok=True)
+    if tree_hash(raw) != entry["tree_sha256"]:
+        raise ValueError("Lance release tree differs from the pinned file list")
+    source = lance.dataset(raw)
+    rows = source.to_table(columns=["episode_idx", "step_idx"]).to_pydict()
+    ids, steps = np.asarray(rows["episode_idx"]), np.asarray(rows["step_idx"])
+    episodes, counts = np.unique(ids, return_counts=True)
+    if len(episodes) < 20 or not np.array_equal(ids, np.repeat(episodes, counts)):
+        raise ValueError("Lance release must contain at least 20 contiguous complete episodes")
+    if not np.array_equal(steps, np.concatenate([np.arange(n) for n in counts])):
+        raise ValueError("Lance release has missing or reordered primitive steps")
+    order = np.random.default_rng(entry["split_seed"]).permutation(episodes)
+    fractions = np.asarray(entry["split_fractions"])
+    if len(fractions) != 3 or np.any(fractions <= 0) or not np.isclose(fractions.sum(), 1):
+        raise ValueError("Lance split fractions must be three positive fractions summing to one")
+    splits = np.split(order, (np.cumsum(fractions)[:2] * len(order)).astype(int))
+    result = {}
+    for role, selected in zip(("train", "validation", "test"), splits):
+        manifest = output / f"{role}.json"
+        if manifest.exists():
+            value = read_manifest(manifest)
+            if (
+                value.get("catalog", {}).get("id") != catalog or value["environment"] != environment
+                or value["source"] != entry["source"] or value["revision"] != entry["revision"]
+                or value.get("origin", {}).get("sha256") != entry["tree_sha256"]
+            ):
+                raise ValueError("Prepared Lance manifest belongs to a different release/environment")
+        else:
+            view = output / f"{role}.lance"
+            if view.exists():
+                raise FileExistsError(f"Incomplete view {view}; inspect it before removing and resuming")
+            temporary = output / f".prepare-{uuid.uuid4().hex}.lance"
+            try:
+                clone = source.shallow_clone(temporary, source.version)
+                clone.drop_columns(entry["excluded_columns"])
+                clone.delete("episode_idx NOT IN (" + ",".join(map(str, selected)) + ")")
+                temporary.rename(view)
+                value = prepare_manifest(
+                    view, manifest, environment, source_url=entry["source"],
+                    revision=entry["revision"], split=role, catalog=catalog,
+                    origin={"path": str(raw), "sha256": entry["tree_sha256"],
+                            "episode_indices": sorted(map(int, selected)),
+                            "excluded_columns": entry["excluded_columns"],
+                            "split_seed": entry["split_seed"], "version": source.version},
+                )
+            finally:
+                shutil.rmtree(temporary, ignore_errors=True)
+        result[role] = {"manifest": str(manifest), "identity": value["identity"], "episodes": value["episodes"]}
+    atomic_json(output / "splits.json", result)
+    return result

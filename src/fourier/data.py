@@ -73,6 +73,7 @@ def prepare_manifest(
     expected_sha256=None,
     catalog=None,
     archive=None,
+    origin=None,
 ):
     import stable_worldmodel as swm
 
@@ -116,6 +117,14 @@ def prepare_manifest(
             split, entry.get("approved_unpacked_sha256", [])
         )
         verified = checksum in approved
+        if entry.get("format") == "lance":
+            verified = bool(
+                origin and origin["sha256"] == entry["tree_sha256"]
+                and tree_hash(origin["path"]) == origin["sha256"]
+                and origin["excluded_columns"] == entry["excluded_columns"]
+            )
+            if not verified or len(ds.lengths) != len(origin["episode_indices"]):
+                raise ValueError("Lance view requires its verified immutable source and episode selection")
         if not verified and archive:
             if file_hash(archive) != entry["archive_sha256"]:
                 raise ValueError("Compressed source differs from the author release checksum")
@@ -124,8 +133,8 @@ def prepare_manifest(
             raise ValueError(
                 "Unverified paper data: provide --archive for the pinned author archive; official OGBench NPZ/custom collections cannot substitute for LeWM data"
             )
-        expected_episodes = entry.get("split_episodes", {}).get(split, entry["released_episodes"])
-        if len(ds.lengths) != expected_episodes or (
+        expected_episodes = entry.get("split_episodes", {}).get(split, entry.get("released_episodes"))
+        if (expected_episodes is not None and len(ds.lengths) != expected_episodes) or (
             "released_frames" in entry and sum(ds.lengths) != entry["released_frames"]
         ):
             raise ValueError("Dataset episode/frame counts differ from the pinned release")
@@ -135,7 +144,11 @@ def prepare_manifest(
             np.asarray(ds.lengths) == entry["released_episode_length"]
         ):
             raise ValueError("Dataset episode lengths differ from the inspected release")
-        proof = {"id": catalog, "verified": True, "archive_sha256": entry["archive_sha256"]}
+        proof = {"id": catalog, "verified": True}
+        if "archive_sha256" in entry:
+            proof["archive_sha256"] = entry["archive_sha256"]
+        elif origin:
+            proof["source_tree_sha256"] = origin["sha256"]
         collection = {
             "kind": "author_release",
             "policy": entry["collection_policy"],
@@ -182,6 +195,9 @@ def prepare_manifest(
         },
         "split_policy": "artifact split; baseline training uses the source random clip split unless external validation is supplied",
     }
+    if origin:
+        result["origin"] = origin
+        result["split_policy"] = "fixed disjoint episode holdout: 90% train, 5% validation, 5% test; no image/action rewrite"
     result["identity"] = fingerprint({k: v for k, v in result.items() if k != "path"})
     output = Path(output)
     if output.exists():
@@ -203,6 +219,10 @@ def read_manifest(path, *, verify=True):
     value["identity"] = identity
     if verify and tree_hash(value["path"]) != value["sha256"]:
         raise ValueError("Dataset content differs from the verified manifest")
+    if verify and value.get("origin"):
+        origin = value["origin"]
+        if tree_hash(origin["path"]) != origin["sha256"]:
+            raise ValueError("Lance view source content differs from its pinned release")
     return value
 
 

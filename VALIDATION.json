@@ -1,8 +1,7 @@
 {
   "schema_version": 1,
-  "date": "2026-11-11",
+  "date": "2026-11-12",
   "release_ready": false,
-  "source_code_sha256": "21dd1a33c7d143a3fa69122bc4d173e2369176322f63c31164bc8b6c1c4fb6a8",
   "upstream": {
     "ok": true,
     "expected_tree": "b4ea0f6e08ddd22c2fc74344de2f5577b9f563ed",
@@ -112,5 +111,22 @@
       "final_loss_equal": true,
       "scope": "One-episode official-release smoke export, warm local cache, RTX3090Ti, optimizer lr=0, no Lightning/checkpoint overhead; concurrent local work possible. Not a PARCC or full-campaign speed claim."
     }
+  },
+  "previous_source_code_sha256": "21dd1a33c7d143a3fa69122bc4d173e2369176322f63c31164bc8b6c1c4fb6a8",
+  "source_code_sha256": "1e060e806ac020a9455a9f4882c6e19ea6e9e3d3f7cd8e8df94d15530d6b5868",
+  "scene": {
+    "external_checks": 7,
+    "regression_checks": 41,
+    "synthetic_cpu_train_validation_reload": [
+      "fourier",
+      "lewm",
+      "dinowm"
+    ],
+    "recorded_action_replay_steps": 3,
+    "maximum_qpos_error": 8.004727991590965e-05,
+    "four_lock_combinations_checked": true,
+    "split_policy": "90/5/5 complete episodes, fixed seed42",
+    "allocated_full_release_checks": "pending; mandatory before training",
+    "scope": "Scene project benchmark only; earlier complete-suite results apply to previous_source_code_sha256"
   }
 }

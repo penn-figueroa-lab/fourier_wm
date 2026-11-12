@@ -13,7 +13,9 @@ environment:
     height: 224
     visualize_info: false
     terminate_at_goal: true
+    mode: task
   image_size: 224
+  observation_keys: [pixels]
   action:
     kinds: [delta, delta, delta, delta, delta]
     scale: [0.05, 0.05, 0.05, 0.3, 1.0]
@@ -29,4 +31,26 @@ environment:
     seed: 3072
   # Legacy environment tag; the selected paper/project protocol is resolved separately.
   benchmark: project_extension
-  dataset: custom
+  dataset: swm_scene
+dataset:
+  environment: scene
+  format: lance
+  source: https://huggingface.co/datasets/galilai-group/ogb_scene_single
+  revision: fd76faa00136c3fd652f320c7b19a2e293f4089a
+  artifact: ogb_scene_single.lance
+  tree_sha256: c89997bbe05cf609592ff75bf6c64efe816f17a6885dfb55fc66f19f2f27d044
+  files:
+    _transactions/0-f9d01be2-4c06-43b7-a493-12743d31aa01.txn: 81de012a1e8adfa0a2d579f2a15661bb07f22e81660263e086b849b17c741509
+    _versions/18446744073709551614.manifest: b07479034975f5dbb4e4e10d4c3ca49a07479b98d647884d19bc3027b3243178
+    _versions/latest_version_hint.json: 2430f1a2ad2982d0067885488a4c89e21ad1d7c83b115ba8f1b20acc88dfaea8
+    data/0110011111100100000111000385414fcc9fcb949e370085bb.lance: 2b8b72d644aa6aa57c96ba0958cf2ccf6064a411c0361a3dbc310e9a14ec7023
+    data/1011010000100010100110113a286547d2838e79ef3d26325a.lance: b7117b925b2fb731d47d07ae9c778cb9f69ac85db1e9a42c83b8131080cc97e6
+  collection_policy: author Scene release; collection seed not published
+  excluded_columns: [privileged_target_task]
+  split_seed: 42
+  split_fractions: [0.9, 0.05, 0.05]
+  note: >-
+    Released SWM visual Scene data, not OGBench state-only play NPZ. Project benchmark,
+    not SWM Table 1. Metadata-only views hold out complete episodes for validation/test;
+    images/actions are shared read-only with the original release. Success requires all
+    cube/button/drawer/window targets, using native tolerances. Privileged fields are reset-only.

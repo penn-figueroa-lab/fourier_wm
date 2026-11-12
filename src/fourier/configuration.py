@@ -119,6 +119,12 @@ def training_config(experiment):
         raise ValueError("Training environment and dataset manifest differ")
     if manifest["split"] not in {"train", "expert_train", "project_train"}:
         raise ValueError("Training requires a training split manifest")
+    if environment["name"] == "scene":
+        from .data import require_paper_dataset
+
+        require_paper_dataset(manifest, "scene")
+        if not experiment.dataset.validation_manifest:
+            raise ValueError("Scene requires dataset.validation_manifest=/data/scene/validation.json from --download")
     if environment["name"] == "pointmaze" and experiment.dataset.regime == "official_navigate":
         expected_source = (
             "https://rail.eecs.berkeley.edu/datasets/ogbench/pointmaze-large-navigate-v0.npz"
@@ -285,6 +291,14 @@ def training_config(experiment):
                 raise ValueError("Invalid validation manifest")
             cfg.validation_dataset = val["path"]
             cfg.validation_identity = val["identity"]
+            if environment["name"] == "scene":
+                require_paper_dataset(val, "scene")
+                train_origin, val_origin = manifest.get("origin", {}), val.get("origin", {})
+                if not train_origin or not val_origin or (
+                    train_origin["sha256"] != val_origin["sha256"]
+                    or set(train_origin["episode_indices"]) & set(val_origin["episode_indices"])
+                ):
+                    raise ValueError("Scene train/validation must be disjoint episodes of the same pinned release")
             if (
                 environment["name"] == "dinowm_pointmaze"
                 and experiment.dataset.regime == "dinowm_release"

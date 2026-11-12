@@ -42,6 +42,17 @@ fourier-wm eval --environment "$TASK" seed=42 run_name="${RUN}_cem" \
 
 For upstream baselines, select `MODEL=lewm` or `dinowm`; for Fourier ablations, add `dynamics_type=linear` or `bilinear`. Use separate run names for training seeds 42, 43 and 44. Keep evaluation seed 42 and share the first evaluation's `tasks.json` across models/seeds using `tasks=/absolute/path/to/tasks.json`.
 
+For **Scene**, use `prepare-data --environment scene --download --output "$FOURIER_DATA/scene"`.
+This pins the released SWM Lance files (37.65 GB), preserves the originals and makes metadata-only
+90/5/5 episode views with split seed 42. Train with `--environment scene`
+and both `dataset.manifest="$FOURIER_DATA/scene/train.json"`
+and `dataset.validation_manifest="$FOURIER_DATA/scene/validation.json"`;
+evaluate with `dataset.manifest="$FOURIER_DATA/scene/test.json"`.
+All three families use image observations and native action channels (converted to rates only for Fourier).
+Task labels and privileged reset fields never enter the model. The original `raw/` directory must remain
+beside the views: they reference its image fragments. Scene is a project benchmark with native all-object
+success (cube, buttons, drawer and window), not a Table 1 reproduction or the OGBench RL leaderboard protocol.
+
 Downloads verify pinned SHA-256 hashes, resume partial HTTP transfers and publish completed files atomically. `progress.json` records download/render ETA. Existing unverified files are rejected. To import an existing author release, use `prepare-data --source /data/file.h5 --archive /data/original.tar.zst --output /data/train.json --split train`. Custom tasks use `--collect --source /data/train.h5 --output /data/train.json`; these are project benchmarks.
 
 ## Environment settings
@@ -54,7 +65,8 @@ There is **one** config directory: [`src/fourier/configs/`](src/fourier/configs)
 | [Cube](src/fourier/configs/env/cube.yaml) | SWM Table 1; **LeWM-collected expert release**, not OGBench play | 3 / 1 image | XYZ, yaw, gripper displacement → separate rates |
 | [Two-Room](src/fourier/configs/env/tworoom.yaml) | LeWM; author heuristic release | 1 / 1 image | Relative XY ×5 per 0.1s → pixel/s |
 | [OGBench PointMaze](src/fourier/configs/env/pointmaze.yaml) | Official navigate release; project comparison | 3 / 1 image | Displacement ×0.2 per 0.1s → rate |
-| Fetch, Scene, SimplePointMaze | Explicit seeded project collections | 3 / 1 image | Native displacement → configured rates |
+| [Scene](src/fourier/configs/env/scene.yaml) | SWM released visual data; project episode-holdout comparison | 3 / 1 image | XYZ, yaw, gripper displacement → separate rates |
+| Fetch, SimplePointMaze | Explicit seeded project collections | 3 / 1 image | Native displacement → configured rates |
 
 The priority is **SWM > LeWM > DINO-WM** for the exact published benchmark. Push-T/Cube paper CEM uses 50 tasks, goal offset 25, budget 50, horizon/replanning 25, and 300 candidates / 30 elites / 30 iterations. Two-Room uses 10 CEM iterations. LeWM-authority training uses 10 epochs; project defaults also use 10. DINO-WM retains its own backbone, action encoder and source optimizer. Paper-labeled DINO-WM retraining with unresolved source/paper conflicts fails explicitly; an alternative requires a project label.
 

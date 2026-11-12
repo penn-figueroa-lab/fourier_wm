@@ -626,6 +626,12 @@ def evaluate(cfg):
                     "steps": steps,
                     "observation_to_action_seconds": latencies,
                 }
+                if envspec["family"] == "scene":
+                    cubes, buttons, drawer, window = env.unwrapped._compute_successes()
+                    record["object_success"] = {
+                        "cube": bool(all(cubes)), "buttons": bool(all(buttons)),
+                        "drawer": bool(drawer), "window": bool(window),
+                    }
                 records.append(record)
                 atomic_json(directory / "episodes.json", records)
                 if frames:
