@@ -87,7 +87,7 @@ fourier-wm train --environment "${TASK}_dense" model_family=fourier seed=42 \
   dataset.validation_manifest="$FOURIER_DATA/dense/${TASK}_dense/validation.json"
 ```
 
-Repeat with `model_family=lewm|dinowm` and seeds 42–44. All three models use the same RGB frames and 900/100 disjoint source-parent split. Each source push contributes one seeded 101-frame window where commands satisfy the declared bounds. Baselines encode native commanded displacements; Fourier converts them to rates **before** normalization/blocking and supervises three teacher-forced five-step endpoints with MSE + 0.09 SIGReg. Reset-only particle/robot states are excluded from model inputs.
+Repeat with `model_family=lewm|dinowm` and seeds 42–44. All three models use the same RGB frames and 900/100 disjoint source-parent split. Each source push contributes one seeded 101-frame window where commands satisfy the declared bounds. Baselines encode native commanded displacements; Fourier converts them to rates **before** normalization/blocking and supervises three teacher-forced five-step endpoints with MSE + 0.09 SIGReg. Dense files omit full particle/robot states. Small tool-pose/target columns remain for command audits and are excluded from model inputs. Preserve the original native source for replay; arbitrary simulator resets need a separately validated replay or task-state cache.
 
 `--resume-data` preserves committed source parents; `--parent-budget 100` completes a bounded preparation job without publishing partial data as ready. `--episodes 1` makes a limited local check, rejected by full training. Replay records source/runtime checksums, causal target commands, rejected windows and physical timing; it never estimates commands from future observed motion.
 

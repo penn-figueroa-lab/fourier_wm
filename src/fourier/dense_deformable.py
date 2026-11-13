@@ -27,7 +27,7 @@ BOUND = 0.02
 
 def replay_recipe():
     return {
-        "version": 2,
+        "version": 3,
         "source_revision": DINO_REVISION,
         "sdk_revision": SDK_REVISION,
         "recorder_sha256": file_hash(__file__),
@@ -40,6 +40,10 @@ def replay_recipe():
         "axes": "PyBullet XYZ; scene units; Z is height",
         "sampling": "One seeded contiguous window per native push; reject out-of-bound windows",
         "split": "Original seed-42 parent episodes; never split windows across roles",
+        "storage": "RGB and causal commands; no per-frame particle/simulator state",
+        "audit_only": [
+            "proprio", "command_target", "primitive_index", "source_episode", "source_push"
+        ],
     }
 
 
@@ -87,7 +91,7 @@ class Recorder:
         self.start, self.frames = start, frames
         self.ik_index = self.generation = 0
         self.last_generation = None
-        self.target = self.orientation = None
+        self.target = None
         self.rows, self.actions, self.targets = [], [], []
         self.previous_pose = self.pose()
         self.steps = 0
@@ -109,29 +113,6 @@ class Recorder:
             flex.set_camPos(position)
             flex.set_camAngle(angle)
 
-    def state(self):
-        """Reset-only state; excluded from all model observations."""
-        sim, flex, bullet = self.sim, self.flex, self.bullet
-        positions = flex.get_positions().reshape(-1, 4)
-        velocities = flex.get_velocities().reshape(-1, 3)
-        shapes = flex.get_shape_states().reshape(-1, 14)
-        joints = np.asarray(
-            [bullet.getJointState(sim.robotId, j)[0] for j in range(sim.num_joints)]
-        )
-        previous = sim.flex_robot_helper.state_pre.copy()
-        header = [1, len(positions), len(shapes), len(joints), len(previous)]
-        return np.concatenate(
-            [
-                header,
-                positions.ravel(),
-                velocities.ravel(),
-                shapes.ravel(),
-                joints,
-                previous.ravel(),
-                self.orientation,
-            ]
-        ).astype(np.float32)
-
     @contextmanager
     def active(self):
         original_step, original_ik = self.flex.step, self.bullet.calculateInverseKinematics
@@ -140,7 +121,6 @@ class Recorder:
             self.ik_index += 1
             self.generation += 1
             self.target = np.asarray(args[2], np.float64).copy()
-            self.orientation = np.asarray(args[3], np.float64).copy()
             return original_ik(*args, **kwargs)
 
         def step(*args, **kwargs):
@@ -163,7 +143,6 @@ class Recorder:
                 self.rows.append(
                     {
                         "pixels": self.observe(),
-                        "state": self.state(),
                         "proprio": self.previous_pose.copy(),
                         "primitive_index": np.int64(self.steps),
                     }
@@ -487,9 +466,14 @@ def validate_dense_manifest(manifest, *, allow_limited=False):
     ):
         raise ValueError("Dense replay source/control timing differs")
     if not report["limited"] and (
-        report["recipe"]["version"] != 2 or not report.get("runtime_sha256")
+        report["recipe"]["version"] not in {2, 3} or not report.get("runtime_sha256")
     ):
         raise ValueError("Full dense replay requires the audited command/runtime recipe")
+    if report['recipe']['version'] == 3:
+        required = {'pixels', 'action', 'proprio', 'command_target', 'primitive_index',
+                    'source_episode', 'source_push'}
+        if set(manifest['columns']) != required:
+            raise ValueError('Compact dense replay must contain RGB/commands/audit columns only')
     train, val = report["roles"]["train"], report["roles"]["validation"]
     from .deformable import episode_split
 

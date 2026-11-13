@@ -223,13 +223,41 @@
     "complete_dense_exports": "pending allocated replay",
     "primitive_closed_loop_evaluation": "not implemented; explicit error",
     "runtime_recovery": {
-      "failed_job": "10505185",
-      "stage": "native EGL initialization before data or training",
-      "fix": "Preserve allocated-node driver search paths and preloads in isolated native child",
+      "failed_job": "10506607",
+      "stage": "DRM-only EGL/CUDA identity matching before data/training",
+      "fix": "Map EGL_NV_device_cuda handles to allocated CUDA PCI; retain allocated-node driver paths",
       "local_nvidia_graphics_and_pyflex_probe": true,
       "local_regression_checks": 42,
       "full_models_restarted": false,
-      "b200_validation": "pending corrected preflight"
+      "b200_validation": "pending compact-format preflight",
+      "previous_failed_job": "10505185",
+      "local_nvidia_egl_with_hidden_drm_paths": true
+    },
+    "compact_storage": {
+      "recipe_version": 3,
+      "per_frame_simulator_state_saved": false,
+      "model_inputs": [
+        "pixels",
+        "action"
+      ],
+      "audit_only_columns": [
+        "proprio",
+        "command_target",
+        "primitive_index",
+        "source_episode",
+        "source_push"
+      ],
+      "actual_local_native_windows": 4,
+      "frames_per_window": 101,
+      "tasks": [
+        "rope",
+        "granular"
+      ],
+      "source_parent_split_unchanged": true,
+      "all_three_models_train_reload_resume_without_state": true,
+      "training_steps_per_model": 2,
+      "full_data_generated": false,
+      "exact_reset_evaluation": "Requires original-source replay or a separately validated task-state cache"
     }
   }
 }
